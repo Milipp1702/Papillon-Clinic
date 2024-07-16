@@ -1,0 +1,6 @@
+@papillon_clinic_server_HostAddress = http://localhost:5012
+
+GET {{papillon_clinic_server_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
