@@ -1,0 +1,1 @@
+ALTER TABLE patients ADD observation VARCHAR(255);

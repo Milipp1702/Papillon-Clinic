@@ -1,0 +1,15 @@
+INSERT INTO appointment_types(name,amount) VALUES('ATENDIMENTO FONO',190);
+INSERT INTO appointment_types(name,amount) VALUES('ATENDIMENTO TO',190);
+INSERT INTO appointment_types(name,amount) VALUES('ATENDIMENTO MUSIC.',190);
+INSERT INTO appointment_types(name,amount) VALUES('ATENDIMENTO PSICOLOGIA',190);
+INSERT INTO appointment_types(name,amount) VALUES('ATENDIMENTO PSICOPEDAGOGIA',190);
+INSERT INTO appointment_types(name,amount) VALUES('ATENDIMENTO PSICOPEDAGOGIA',190);
+INSERT INTO appointment_types(name,amount) VALUES('ATENDIMENTO DIF.',130);
+INSERT INTO appointment_types(name,amount) VALUES('ATENT. FONO. ESPECIAL',160);
+INSERT INTO appointment_types(name,amount) VALUES('ATENT. MUSIC. ESPECIAL',130);
+INSERT INTO appointment_types(name,amount) VALUES('ATENDIMENTO CREDITO',180);
+INSERT INTO appointment_types(name,amount) VALUES('AVALIAÇÃO 1',250);
+INSERT INTO appointment_types(name,amount) VALUES('AVALIAÇÃO 2',250);
+INSERT INTO appointment_types(name,amount) VALUES('AVALIAÇÃO 3',250);
+INSERT INTO appointment_types(name,amount) VALUES('VISITA ESCOLAR',300);
+INSERT INTO appointment_types(name,amount) VALUES('REUNIÃO',180);

@@ -1,0 +1,1 @@
+ALTER TABLE professionals RENAME COLUMN specialty TO speciality;

@@ -1,0 +1,1 @@
+ALTER TABLE guardians RENAME COLUMN isMain TO is_main;

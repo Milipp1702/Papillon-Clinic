@@ -1,0 +1,22 @@
+server:
+  port: 8080
+  servlet:
+    context-path: /api
+  error:
+    include-message: always
+    include-stacktrace: never
+spring:
+  jpa:
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+  datasource:
+    username: ${DB_USER}
+    password: ${DB_PASSWORD}
+    url: ${DB_URL}
+    driver-class-name: com.mysql.cj.jdbc.Driver
+api:
+  security:
+    token:
+      secret: ${JWT_SECRET:$2y$10$HpXiB.9/2ld6L/LTNalv5eiVBUOBbymN7aVVv2jpLtzYJetIkrZuy}

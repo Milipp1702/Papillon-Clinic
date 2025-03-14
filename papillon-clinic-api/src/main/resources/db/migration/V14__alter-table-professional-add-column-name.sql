@@ -1,0 +1,1 @@
+ALTER TABLE professionals ADD name VARCHAR(255) NOT NULL;
