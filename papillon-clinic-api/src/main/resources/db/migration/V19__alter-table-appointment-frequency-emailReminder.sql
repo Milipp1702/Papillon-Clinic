@@ -1,1 +1,0 @@
-ALTER TABLE appointment_frequency RENAME COLUMN emailReminder TO email_reminder;
