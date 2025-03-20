@@ -4,6 +4,8 @@ CREATE TABLE appointment_frequency (
     frequency VARCHAR(50) NOT NULL,
     frequency_interval INTEGER,
     emailReminder BOOLEAN,
+    appointment_id VARCHAR(36),
 
-    PRIMARY KEY(id)
+    PRIMARY KEY(id),
+    FOREIGN KEY(appointment_id) references appointments(id)
 );
