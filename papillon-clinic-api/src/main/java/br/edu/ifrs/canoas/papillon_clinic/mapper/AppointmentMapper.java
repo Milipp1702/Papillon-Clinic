@@ -1,16 +1,15 @@
 package br.edu.ifrs.canoas.papillon_clinic.mapper;
 
 
-import br.edu.ifrs.canoas.papillon_clinic.domain.appointment.Appointment;
-import br.edu.ifrs.canoas.papillon_clinic.domain.appointment.AppointmentDTO;
-import br.edu.ifrs.canoas.papillon_clinic.domain.appointment.AppointmentResponseDTO;
-import br.edu.ifrs.canoas.papillon_clinic.domain.appointment.AppointmentTypes;
+import br.edu.ifrs.canoas.papillon_clinic.domain.address.Address;
+import br.edu.ifrs.canoas.papillon_clinic.domain.appointment.*;
 import br.edu.ifrs.canoas.papillon_clinic.domain.patient.Patient;
 import br.edu.ifrs.canoas.papillon_clinic.domain.professional.Professional;
 
 public class AppointmentMapper {
 
     public static Appointment fromDtoToEntity(AppointmentDTO dto, AppointmentTypes appointmentTypes, Patient patient, Professional professional){
+        AppointmentFrequency frequency = AppointmentFrequencyMapper.fromDtoToEntity(dto.frequency());
         Appointment appointment = new Appointment();
         appointment.setAppointmentDate(dto.appointment_date());
         appointment.setAppointmentTypes(appointmentTypes);
@@ -19,6 +18,7 @@ public class AppointmentMapper {
         appointment.setObservation(dto.observation());
         appointment.setPayment_date(dto.payment_date());
         appointment.setPayment_type(dto.payment_type());
+        appointment.assignFrequency(frequency);
         return appointment;
     }
 
