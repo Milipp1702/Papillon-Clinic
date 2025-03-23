@@ -42,10 +42,8 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
   };
 
   useEffect(() => {
-    console.log(user);
     if (user) {
       verifyToken().then((isValid) => {
-        console.log(isValid);
         if (isValid) {
           setAuth(true);
         }
