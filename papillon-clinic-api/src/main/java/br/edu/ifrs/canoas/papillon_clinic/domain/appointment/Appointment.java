@@ -45,10 +45,18 @@ public class Appointment {
     @JoinColumn(name = "appointment_type")
     private AppointmentTypes appointmentTypes;
 
-    @OneToOne(mappedBy = "appointment", cascade = CascadeType.ALL)
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "appointment_frequency_id", referencedColumnName = "id")
     private AppointmentFrequency frequency;
 
     public boolean isPaid(){
         return this.payment_date!=null;
+    }
+
+    public void assignFrequency(AppointmentFrequency frequency) {
+        this.frequency = frequency;
+        if (frequency != null) {
+            frequency.setAppointment(this);
+        }
     }
 }

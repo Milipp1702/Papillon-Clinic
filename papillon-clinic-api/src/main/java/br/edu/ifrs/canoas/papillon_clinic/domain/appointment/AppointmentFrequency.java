@@ -26,10 +26,9 @@ public class AppointmentFrequency {
     @Column()
     private Integer frequency_interval;
 
-    @Column
+    @Column(name = "email_reminder")
     private boolean emailReminder;
 
-    @OneToOne()
-    @JoinColumn(name = "appointment_id", referencedColumnName = "id")
+    @OneToOne(mappedBy = "frequency")
     private Appointment appointment;
 }
