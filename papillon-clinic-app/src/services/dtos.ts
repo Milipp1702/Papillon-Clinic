@@ -23,6 +23,8 @@ export type ProfessionalDTO = {
   phone_number: string;
   speciality: string;
   discount: number;
+  workdays: string[];
+  workshift: string[];
 };
 
 export type PatientListDTO = {
@@ -39,6 +41,24 @@ export type ProfessionalListDTO = {
   crm: string;
 };
 
+export type AppointmentDTO = {
+  id?: string;
+  appointment_date: string;
+  patient_id: string;
+  appointment_type_id: string;
+  specialty_id?: string;
+  payment_type: string;
+  professional_id: string;
+  payment_date?: string;
+  observation: string;
+  appointment_frequency?: {
+    end_date: string;
+    frequency: string;
+    frequency_interval?: number;
+    email_reminder?: boolean;
+  };
+};
+
 export type AppointmentListDTO = {
   id: string;
   date: string;
@@ -46,6 +66,17 @@ export type AppointmentListDTO = {
   professional: string;
   type: string;
   isPaid: boolean;
+};
+
+export type AppointmentTypeListDTO = {
+  id: string;
+  name: string;
+  amount: number;
+};
+
+export type SpecialtyListDTO = {
+  id: string;
+  name: string;
 };
 
 export type Page<T> = {

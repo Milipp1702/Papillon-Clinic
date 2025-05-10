@@ -8,4 +8,5 @@ export const SCREEN_PATHS = {
   appointments: '/appointments',
   registerPatient: '/patients/register',
   registerProfessional: '/professional/register',
+  registerAppointment: '/appointments/register',
 };
