@@ -5,7 +5,7 @@ import Button from '../../components/baseComponents/Button';
 import Input from '../../components/baseComponents/Input';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { ONLY_NUMBERS } from '../../constants/regexPatterns';
-import { number, object, string } from 'yup';
+import { array, number, object, string } from 'yup';
 import VisuallyHidden from '../../components/baseComponents/VisuallyHidden';
 import { dataFormat } from '../../constants/types';
 import InputError from '../../components/baseComponents/InputError';
@@ -23,6 +23,17 @@ const SPECIALITY_OPTIONS = [
   'PSICOPEDAGOGIA',
 ];
 
+const WORKDAYS = [
+  'Segunda-feira',
+  'Terça-feira',
+  'Quarta-feira',
+  'Quinta-feira',
+  'Sexta-feira',
+  'Sábado',
+];
+
+const WORKSHIFT = ['Manhã', 'Tarde'];
+
 type FormProfessionalData = {
   id?: string;
   name: string;
@@ -31,6 +42,8 @@ type FormProfessionalData = {
   phone_number: string;
   speciality: string;
   discount: number;
+  workdays: string[];
+  workshift: string[];
 };
 
 const formErrors: dataFormat = {
@@ -55,6 +68,12 @@ const formErrors: dataFormat = {
   },
   discount: {
     typeError: 'Informe o valor a ser descontado!',
+  },
+  workdays: {
+    required: 'Informe os dias de trabalho!',
+  },
+  workshift: {
+    required: 'Informe os turnos de trabalho!',
   },
 };
 
@@ -81,6 +100,8 @@ const RegisterProfessional: React.FC = () => {
       .max(11),
     speciality: string().trim().required(),
     discount: number().required(),
+    workdays: array().of(string().trim().required()).required(),
+    workshift: array().of(string().trim().required()).required(),
   });
 
   const {
@@ -202,6 +223,49 @@ const RegisterProfessional: React.FC = () => {
               )}
             </S.InputContainer>
           </S.Fieldset>
+          <S.InputContainer>
+            <label htmlFor="workdays">Dias de Trabalho</label>
+            <S.CheckboxGroup>
+              {WORKDAYS.map((day, index) => (
+                <div key={index}>
+                  <input
+                    type="checkbox"
+                    id={`workday-${index}`}
+                    value={day}
+                    {...register('workdays')}
+                  />
+                  <label htmlFor={`workday-${index}`}>{day}</label>
+                </div>
+              ))}
+            </S.CheckboxGroup>
+            {errors.workdays?.type && (
+              <InputError>
+                {formErrors['workdays'][errors.workdays?.type]}
+              </InputError>
+            )}
+          </S.InputContainer>
+
+          <S.InputContainer>
+            <label htmlFor="workshift">Turnos</label>
+            <S.CheckboxGroup>
+              {WORKSHIFT.map((shift, index) => (
+                <div key={index}>
+                  <input
+                    type="checkbox"
+                    id={`workshift-${index}`}
+                    value={shift}
+                    {...register('workshift')}
+                  />
+                  <label htmlFor={`workshift-${index}`}>{shift}</label>
+                </div>
+              ))}
+            </S.CheckboxGroup>
+            {errors.workshift?.type && (
+              <InputError>
+                {formErrors['workshift'][errors.workshift?.type]}
+              </InputError>
+            )}
+          </S.InputContainer>
           {success && (
             <S.SuccessMessage>Profissional Cadastrado!</S.SuccessMessage>
           )}

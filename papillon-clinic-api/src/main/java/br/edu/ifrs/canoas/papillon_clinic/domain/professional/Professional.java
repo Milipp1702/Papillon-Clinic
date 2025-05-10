@@ -28,8 +28,9 @@ public class Professional {
     @Column
     private String crm;
 
-    @Enumerated(EnumType.STRING)
-    private Speciality speciality;
+    @ManyToOne
+    @JoinColumn(name = "specialty_id")
+    private Specialty specialty;
 
     @Column
     private String phone_number;
@@ -39,4 +40,7 @@ public class Professional {
 
     @OneToMany(mappedBy = "professional", cascade = CascadeType.ALL)
     private List<Appointment> listAppointments;
+
+    @OneToMany(mappedBy = "professional", cascade = CascadeType.ALL)
+    private List<ProfessionalWorkday> workdays;
 }

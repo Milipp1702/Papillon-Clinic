@@ -23,7 +23,7 @@ public class AppointmentFrequency {
     @Enumerated(EnumType.STRING)
     private Frequency frequency;
 
-    @Column()
+    @Column
     private Integer frequency_interval;
 
     @Column(name = "email_reminder")

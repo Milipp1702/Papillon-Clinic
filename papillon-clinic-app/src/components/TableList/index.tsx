@@ -5,6 +5,7 @@ import * as S from './styles';
 type Column = {
   field: string;
   headerName: string;
+  renderCell?: (value: any) => React.ReactNode;
 };
 
 type Row = {
@@ -27,6 +28,9 @@ const TableList: React.FC<Props> = ({ columns, rows, redirect }) => {
               <span>{column.headerName}</span>
             </th>
           ))}
+          <th key={`table-list-header-access`}>
+            <span>Acessar</span>
+          </th>
         </tr>
       </thead>
       <tbody>
@@ -36,7 +40,11 @@ const TableList: React.FC<Props> = ({ columns, rows, redirect }) => {
           return (
             <tr className={variant} key={'tablelist-' + index}>
               {columns.map((column, index) => (
-                <td key={`tablelist-item-${index}`}>{row[column.field]}</td>
+                <td key={`tablelist-item-${index}`}>
+                  {column.renderCell
+                    ? column.renderCell(row[column.field])
+                    : row[column.field]}
+                </td>
               ))}
 
               <td className="options-column">
@@ -46,7 +54,6 @@ const TableList: React.FC<Props> = ({ columns, rows, redirect }) => {
                   to={`${redirect}/${row['id']}`}
                   aria-label="Acessar"
                 >
-                  Acessar
                   <Icon icon="redirect" size={20} />
                 </Link>
               </td>

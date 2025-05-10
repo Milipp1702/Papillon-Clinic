@@ -2,11 +2,15 @@ import { useContext, useMemo, useState } from 'react';
 import { useHttp } from './base/useHttp';
 import { AuthContext, User } from '../../context/AuthContext';
 import {
+  AppointmentDTO,
+  AppointmentListDTO,
   Page,
   PatientDTO,
   PatientListDTO,
   ProfessionalDTO,
   ProfessionalListDTO,
+  AppointmentTypeListDTO,
+  SpecialtyListDTO,
 } from '../dtos';
 
 export type AuthData = {
@@ -21,6 +25,7 @@ interface IRoutes {
   registerProfessional: (
     professional: ProfessionalDTO
   ) => Promise<ProfessionalDTO>;
+  registerAppointment: (appointment: AppointmentDTO) => Promise<AppointmentDTO>;
   updateProfessional: (
     professional: ProfessionalDTO
   ) => Promise<ProfessionalDTO>;
@@ -29,6 +34,15 @@ interface IRoutes {
     page?: number,
     size?: number
   ) => Promise<Page<ProfessionalListDTO>>;
+  getAppointments: (
+    page?: number,
+    size?: number
+  ) => Promise<Page<AppointmentListDTO>>;
+  getAppointmentTypes: () => Promise<AppointmentTypeListDTO[]>;
+  getSpecialties: () => Promise<SpecialtyListDTO[]>;
+  getProfessionalsBySpecialty: (
+    specialty_id: string
+  ) => Promise<ProfessionalListDTO[]>;
   getTopSixProfessionals: () => Promise<ProfessionalListDTO[]>;
   getNumberOfProfessionals: () => Promise<number>;
   getNumberOfPatients: () => Promise<number>;
@@ -71,6 +85,11 @@ export const useClinicApi = () => {
       professional
     );
   }
+
+  async function registerAppointment(appointment: AppointmentDTO) {
+    return await httpInstance.post<AppointmentDTO>('/appointment', appointment);
+  }
+
   async function updateProfessional(professional: ProfessionalDTO) {
     return await httpInstance.update<ProfessionalDTO>(
       '/professional',
@@ -88,6 +107,26 @@ export const useClinicApi = () => {
     return await httpInstance.get<Page<ProfessionalListDTO>>(
       `/professional?page=${page}&size=${size}`
     );
+  }
+
+  async function getProfessionalsBySpecialty(specialty_id: string) {
+    return await httpInstance.get<ProfessionalListDTO[]>(
+      `/professional/getBySpecialty?specialty_id=${specialty_id}`
+    );
+  }
+
+  async function getAppointments(page: number = 0, size: number = 10) {
+    return await httpInstance.get<Page<AppointmentListDTO>>(
+      `/appointment?page=${page}&size=${size}`
+    );
+  }
+
+  async function getAppointmentTypes() {
+    return await httpInstance.get<AppointmentTypeListDTO[]>(`/appointmentType`);
+  }
+
+  async function getSpecialties() {
+    return await httpInstance.get<SpecialtyListDTO[]>(`/specialty`);
   }
 
   async function getTopSixProfessionals() {
@@ -131,8 +170,13 @@ export const useClinicApi = () => {
         auth,
         registerPatient,
         registerProfessional,
+        registerAppointment,
         getPatients,
         getProfessionals,
+        getProfessionalsBySpecialty,
+        getAppointments,
+        getAppointmentTypes,
+        getSpecialties,
         getTopSixProfessionals,
         getNumberOfProfessionals,
         getNumberOfPatients,

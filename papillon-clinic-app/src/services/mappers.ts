@@ -1,4 +1,4 @@
-import { PatientDTO, ProfessionalDTO } from './dtos';
+import { AppointmentDTO, PatientDTO, ProfessionalDTO } from './dtos';
 
 type PatientForm = {
   name: string;
@@ -37,6 +37,8 @@ type ProfessionalFormData = {
   phone_number: string;
   speciality: string;
   discount: number;
+  workdays: string[];
+  workshift: string[];
 };
 
 export const patientMapper = (data: PatientForm): PatientDTO => {
@@ -78,5 +80,7 @@ export const professionalToFormData = (
     phone_number: data.phone_number,
     speciality: data.speciality,
     discount: data.discount,
+    workdays: data.workdays,
+    workshift: data.workshift,
   };
 };

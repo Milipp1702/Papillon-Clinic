@@ -23,7 +23,7 @@ public class ProfessionalController {
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     @Transactional
-    public void register(@RequestBody ProfessionalDTO professionalDto){
+    public void register(@RequestBody ProfessionalDTO professionalDto) throws Exception {
         service.registerProfessional(professionalDto);
     }
 
@@ -55,5 +55,11 @@ public class ProfessionalController {
     @ResponseStatus(HttpStatus.OK)
     public ResponseEntity<List<ProfessionalResponseDTO>> getTop6Professionals(){
         return ResponseEntity.ok(service.getTop6Professional());
+    }
+
+    @GetMapping("getBySpecialty")
+    @ResponseStatus(HttpStatus.OK)
+    public ResponseEntity<List<ProfessionalResponseDTO>> getProfessionalsBySpecialty(String specialty_id){
+        return ResponseEntity.ok(service.getProfessionalsBySpecialty(specialty_id));
     }
 }

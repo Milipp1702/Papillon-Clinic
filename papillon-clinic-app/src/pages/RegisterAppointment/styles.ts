@@ -53,23 +53,6 @@ export const Select = styled.select`
   padding: 10px;
 `;
 
-export const CheckboxGroup = styled.div`
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-
-  input[type='checkbox'] {
-    width: 24px;
-    height: 24px;
-    cursor: pointer;
-  }
-
-  label {
-    font-size: 16px;
-    margin-left: 8px;
-  }
-`;
-
 export const SuccessMessage = styled.span`
   display: inline-block;
   color: ${({ theme }) => theme.colors.success};
