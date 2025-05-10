@@ -2,11 +2,13 @@ import { useContext, useMemo, useState } from 'react';
 import { useHttp } from './base/useHttp';
 import { AuthContext, User } from '../../context/AuthContext';
 import {
+  AppointmentListDTO,
   Page,
   PatientDTO,
   PatientListDTO,
   ProfessionalDTO,
   ProfessionalListDTO,
+  AppointmentTypeListDTO,
 } from '../dtos';
 
 export type AuthData = {
@@ -29,6 +31,10 @@ interface IRoutes {
     page?: number,
     size?: number
   ) => Promise<Page<ProfessionalListDTO>>;
+  getAppointments: (
+    page?: number,
+    size?: number
+  ) => Promise<Page<AppointmentListDTO>>;
   getTopSixProfessionals: () => Promise<ProfessionalListDTO[]>;
   getNumberOfProfessionals: () => Promise<number>;
   getNumberOfPatients: () => Promise<number>;
@@ -90,6 +96,12 @@ export const useClinicApi = () => {
     );
   }
 
+  async function getAppointments(page: number = 0, size: number = 10) {
+    return await httpInstance.get<Page<AppointmentListDTO>>(
+      `/appointment?page=${page}&size=${size}`
+    );
+  }
+
   async function getTopSixProfessionals() {
     return await httpInstance.get<ProfessionalListDTO[]>(
       '/professional/getRanking'
@@ -133,6 +145,7 @@ export const useClinicApi = () => {
         registerProfessional,
         getPatients,
         getProfessionals,
+        getAppointments,
         getTopSixProfessionals,
         getNumberOfProfessionals,
         getNumberOfPatients,

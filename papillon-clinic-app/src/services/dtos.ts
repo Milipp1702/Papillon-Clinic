@@ -39,6 +39,15 @@ export type ProfessionalListDTO = {
   crm: string;
 };
 
+export type AppointmentListDTO = {
+  id: string;
+  date: string;
+  patient: string;
+  professional: string;
+  type: string;
+  isPaid: boolean;
+};
+
 export type Page<T> = {
   content: T[];
   pageable: {

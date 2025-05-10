@@ -21,7 +21,12 @@ const NAV_LINKS = [
     icon: 'professional',
     isAdmin: true,
   },
-  { path: '#', name: 'Atendimentos', icon: 'appointment', isAdmin: false },
+  {
+    path: '/appointments',
+    name: 'Atendimentos',
+    icon: 'appointment',
+    isAdmin: false,
+  },
   { path: '#', name: 'Financeiro', icon: 'finance', isAdmin: true },
   { path: '#', name: 'Agenda', icon: 'calendar', isAdmin: false },
   { path: '#', name: 'Relatórios', icon: 'notepad', isAdmin: false },
