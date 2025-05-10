@@ -40,4 +40,7 @@ public class Professional {
 
     @OneToMany(mappedBy = "professional", cascade = CascadeType.ALL)
     private List<Appointment> listAppointments;
+
+    @OneToMany(mappedBy = "professional", cascade = CascadeType.ALL)
+    private List<ProfessionalWorkday> workdays;
 }

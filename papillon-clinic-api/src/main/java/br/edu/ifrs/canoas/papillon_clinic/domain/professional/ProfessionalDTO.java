@@ -1,4 +1,6 @@
 package br.edu.ifrs.canoas.papillon_clinic.domain.professional;
 
-public record ProfessionalDTO(String id, String name, String cpf, String crm, Speciality speciality, String phone_number, double discount) {
+import java.util.List;
+
+public record ProfessionalDTO(String id, String name, String cpf, String crm, String specialty_id, String phone_number, double discount, List<ProfessionalWorkdayDTO> workdays) {
 }
