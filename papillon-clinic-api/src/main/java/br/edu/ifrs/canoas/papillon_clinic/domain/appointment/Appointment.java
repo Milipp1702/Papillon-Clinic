@@ -5,9 +5,8 @@ import br.edu.ifrs.canoas.papillon_clinic.domain.patient.Patient;
 import br.edu.ifrs.canoas.papillon_clinic.domain.professional.Professional;
 import jakarta.persistence.*;
 import lombok.*;
-
-import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 
 @Table(name = "appointments")
 @Entity(name = "appointments")
@@ -22,7 +21,7 @@ public class Appointment {
     private String id;
 
     @Column(name = "appointment_date")
-    private LocalDate appointmentDate;
+    private LocalDateTime appointmentDate;
 
     @Column
     private String payment_type;
@@ -45,8 +44,8 @@ public class Appointment {
     @JoinColumn(name = "appointment_type")
     private AppointmentTypes appointmentTypes;
 
-    @OneToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "appointment_frequency_id", referencedColumnName = "id")
+    @ManyToOne
+    @JoinColumn(name = "appointment_frequency_id")
     private AppointmentFrequency frequency;
 
     public boolean isPaid(){
@@ -54,9 +53,15 @@ public class Appointment {
     }
 
     public void assignFrequency(AppointmentFrequency frequency) {
+        if (this.frequency != null) {
+            this.frequency.getAppointments().remove(this);
+        }
         this.frequency = frequency;
         if (frequency != null) {
-            frequency.setAppointment(this);
+            if (frequency.getAppointments() == null) {
+                frequency.setAppointments(new ArrayList<>());
+            }
+            frequency.getAppointments().add(this);
         }
     }
 }

@@ -1,6 +1,6 @@
 package br.edu.ifrs.canoas.papillon_clinic.domain.appointment;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 
-public record AppointmentFrequencyDTO(LocalDateTime end_date, Frequency frequency, Integer frequency_interval, boolean emailReminder, String appointment_id ) {
+public record AppointmentFrequencyDTO(String id,LocalDate end_date, Frequency frequency, Integer frequency_interval, boolean emailReminder) {
 }

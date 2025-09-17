@@ -3,7 +3,9 @@ package br.edu.ifrs.canoas.papillon_clinic.domain.appointment;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 
 @Table(name = "appointment_frequency")
 @Entity(name = "appointment_frequency")
@@ -18,7 +20,7 @@ public class AppointmentFrequency {
     private String id;
 
     @Column
-    private LocalDateTime end_date;
+    private LocalDate end_date;
 
     @Enumerated(EnumType.STRING)
     private Frequency frequency;
@@ -29,6 +31,6 @@ public class AppointmentFrequency {
     @Column(name = "email_reminder")
     private boolean emailReminder;
 
-    @OneToOne(mappedBy = "frequency")
-    private Appointment appointment;
+    @OneToMany(mappedBy = "frequency", cascade = CascadeType.ALL)
+    private List<Appointment> appointments = new ArrayList<>();
 }
