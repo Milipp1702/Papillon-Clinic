@@ -97,6 +97,7 @@ const WorkdaySelector: React.FC<Props> = ({ selected, onChange }) => {
               type="checkbox"
               id={`day-${day.id}`}
               onChange={() => toggleDay(day.id)}
+              checked={isDaySelected(day.id)}
             />
             <label htmlFor={`day-${day.id}`}>{day.name}</label>
           </S.DayHeader>
