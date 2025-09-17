@@ -47,6 +47,10 @@ const Routes: React.FC = () => {
           path={SCREEN_PATHS.appointments}
           element={<Appointments />}
         ></Route>
+        <Route
+          path={SCREEN_PATHS.appointment}
+          element={<RegisterAppointment />}
+        ></Route>
       </Route>
     </Switch>
   );

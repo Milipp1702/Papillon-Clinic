@@ -24,6 +24,6 @@ public class ProfessionalMapper {
 
     public static ProfessionalDTO fromEntityToDto(Professional professional){
         List<ProfessionalWorkdayDTO> workdays = professional.getWorkdays().stream().map(ProfessionalWorkdayMapper::fromEntityToDto).toList();
-        return new ProfessionalDTO(professional.getId(), professional.getName(), professional.getCpf(), professional.getCrm(), professional.getSpecialty().getName(), professional.getPhone_number(), professional.getDiscount(),workdays);
+        return new ProfessionalDTO(professional.getId(), professional.getName(), professional.getCpf(), professional.getCrm(), professional.getSpecialty().getId(), professional.getPhone_number(), professional.getDiscount(),workdays);
     }
 }

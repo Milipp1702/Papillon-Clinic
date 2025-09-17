@@ -1,40 +1,35 @@
 import styled from 'styled-components';
 
-export const GuardianTable = styled.table`
+export const AvailableSlotsTable = styled.table`
+  width: 100%;
   font-weight: bold;
   border-spacing: 0;
   border-collapse: collapse;
-  width: 100%;
+  border: 1px solid ${({ theme }) => theme.colors.grey[300]};
+  border-radius: 4px;
 
-  thead {
-    text-align: left;
+  th,
+  td {
+    text-align: center;
+    padding: 8px;
   }
 
-  thead th {
-    position: sticky;
-    top: 0;
-    z-index: 2;
-    background-color: #fff;
+  th:nth-child(2),
+  td:nth-child(2),
+  th:nth-child(3),
+  td:nth-child(3),
+  th:nth-child(4),
+  td:nth-child(4) {
+    width: calc((100% - 40px) / 3);
   }
 
   tr {
     height: 62px;
-
-    :nth-child(1) {
-      border-left: none;
-    }
   }
 
   td {
     height: 100%;
-    text-align: center;
     border-left: 1px solid ${({ theme }) => theme.colors.grey[300]};
-  }
-
-  tbody {
-    max-height: 100%;
-    overflow-y: auto;
-    position: relative;
   }
 
   tr.grey {
@@ -49,11 +44,6 @@ export const GuardianTable = styled.table`
     align-items: center;
     justify-content: center;
     height: 62px;
-
-    a {
-      max-width: 200px;
-
-      gap: 6px;
-    }
+    gap: 24px;
   }
 `;

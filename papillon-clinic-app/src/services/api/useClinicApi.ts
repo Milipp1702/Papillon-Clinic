@@ -1,4 +1,4 @@
-import { useContext, useMemo, useState } from 'react';
+import { useContext, useMemo } from 'react';
 import { useHttp } from './base/useHttp';
 import { AuthContext, User } from '../../context/AuthContext';
 import {
@@ -11,6 +11,8 @@ import {
   ProfessionalListDTO,
   AppointmentTypeListDTO,
   SpecialtyListDTO,
+  AvailableSlotsDTO,
+  WorkdayWithShiftsDTO,
 } from '../dtos';
 
 export type AuthData = {
@@ -25,10 +27,11 @@ interface IRoutes {
   registerProfessional: (
     professional: ProfessionalDTO
   ) => Promise<ProfessionalDTO>;
-  registerAppointment: (appointment: AppointmentDTO) => Promise<AppointmentDTO>;
+  registerAppointment: (appointment: AppointmentDTO) => Promise<String[]>;
   updateProfessional: (
     professional: ProfessionalDTO
   ) => Promise<ProfessionalDTO>;
+  updateAppointment: (appointment: AppointmentDTO) => Promise<String[]>;
   getPatients: (page?: number, size?: number) => Promise<Page<PatientListDTO>>;
   getProfessionals: (
     page?: number,
@@ -47,8 +50,15 @@ interface IRoutes {
   getNumberOfProfessionals: () => Promise<number>;
   getNumberOfPatients: () => Promise<number>;
   getNumberOfAppointments: () => Promise<number>;
+  getAllAvailableSlots: (
+    professionalIds: string[],
+    specialty: string,
+    date: string
+  ) => Promise<AvailableSlotsDTO[]>;
+  getAllWorkdaysWithShifts: () => Promise<WorkdayWithShiftsDTO[]>;
   findPatientById: (id: string) => Promise<PatientDTO>;
   findProfessionalById: (id: string) => Promise<ProfessionalDTO>;
+  findAppointmentById: (id: string) => Promise<AppointmentDTO>;
   verifyToken: () => Promise<string>;
 }
 
@@ -87,7 +97,7 @@ export const useClinicApi = () => {
   }
 
   async function registerAppointment(appointment: AppointmentDTO) {
-    return await httpInstance.post<AppointmentDTO>('/appointment', appointment);
+    return await httpInstance.post<String[]>('/appointment', appointment);
   }
 
   async function updateProfessional(professional: ProfessionalDTO) {
@@ -95,6 +105,10 @@ export const useClinicApi = () => {
       '/professional',
       professional
     );
+  }
+
+  async function updateAppointment(appointment: AppointmentDTO) {
+    return await httpInstance.update<String[]>(`/appointment`, appointment);
   }
 
   async function getPatients(page: number = 0, size: number = 10) {
@@ -147,11 +161,42 @@ export const useClinicApi = () => {
     return await httpInstance.get<number>('/appointment/getAmount');
   }
 
+  async function getAllWorkdaysWithShifts() {
+    return await httpInstance.get<WorkdayWithShiftsDTO[]>(
+      '/workday/getWorkdaysWithShifts'
+    );
+  }
+
+  async function getAllAvailableSlots(
+    professionalIds: string[],
+    specialty?: string,
+    date?: string
+  ) {
+    const queryParams = professionalIds.map((id) => `ids=${id}`);
+
+    if (specialty) {
+      queryParams.push(`specialty=${specialty}`);
+    }
+
+    if (date) {
+      queryParams.push(`date=${date}`);
+    }
+
+    const url = `/professional/all-available-slots?${queryParams.join('&')}`;
+    console.log('URL:', url);
+
+    return await httpInstance.get<AvailableSlotsDTO[]>(url);
+  }
+
   async function findPatientById(id: string) {
     return await httpInstance.get<PatientDTO>(`/patient/${id}`);
   }
   async function findProfessionalById(id: string) {
     return await httpInstance.get<ProfessionalDTO>(`/professional/${id}`);
+  }
+
+  async function findAppointmentById(id: string) {
+    return await httpInstance.get<AppointmentDTO>(`/appointment/${id}`);
   }
 
   async function updatePatient(patient: PatientDTO) {
@@ -181,9 +226,13 @@ export const useClinicApi = () => {
         getNumberOfProfessionals,
         getNumberOfPatients,
         getNumberOfAppointments,
+        getAllAvailableSlots,
+        getAllWorkdaysWithShifts,
         findPatientById,
+        findAppointmentById,
         updatePatient,
         updateProfessional,
+        updateAppointment,
         findProfessionalById,
         verifyToken,
       },

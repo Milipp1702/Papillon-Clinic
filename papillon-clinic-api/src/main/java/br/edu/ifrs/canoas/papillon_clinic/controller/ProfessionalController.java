@@ -1,8 +1,10 @@
 package br.edu.ifrs.canoas.papillon_clinic.controller;
 
+import br.edu.ifrs.canoas.papillon_clinic.domain.professional.AvailableSlot;
 import br.edu.ifrs.canoas.papillon_clinic.domain.professional.ProfessionalDTO;
 import br.edu.ifrs.canoas.papillon_clinic.domain.professional.ProfessionalResponseDTO;
 import br.edu.ifrs.canoas.papillon_clinic.service.ProfessionalService;
+import br.edu.ifrs.canoas.papillon_clinic.service.ProfessionalWorkdayService;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -12,13 +14,18 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("professional")
 public class ProfessionalController {
     @Autowired
     private ProfessionalService service;
+
+    @Autowired
+    private ProfessionalWorkdayService professionalWorkdayService;
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
@@ -62,4 +69,21 @@ public class ProfessionalController {
     public ResponseEntity<List<ProfessionalResponseDTO>> getProfessionalsBySpecialty(String specialty_id){
         return ResponseEntity.ok(service.getProfessionalsBySpecialty(specialty_id));
     }
+
+    @GetMapping("all-available-slots")
+    public ResponseEntity<List<AvailableSlot>> getAllAvailableSlots(
+            @RequestParam(required = false) List<String> ids,
+            @RequestParam(required = false) String date,
+            @RequestParam(required = false) String specialty) {
+
+        LocalDate parsedDate = null;
+        if (date != null && !date.isEmpty()) {
+            parsedDate = LocalDate.parse(date);
+        }
+
+        List<AvailableSlot> slots = professionalWorkdayService.getAllAvailableSlots(parsedDate, specialty, ids);
+        return ResponseEntity.ok(slots);
+    }
+
+
 }

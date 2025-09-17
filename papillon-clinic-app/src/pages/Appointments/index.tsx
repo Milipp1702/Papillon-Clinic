@@ -60,6 +60,7 @@ const Appointments: React.FC = () => {
             to={SCREEN_PATHS.registerAppointment}
             variant="button"
             variantButton="terciary"
+            className="new-appointment-button"
           >
             Novo Atendimento
           </Link>
@@ -76,11 +77,13 @@ const Appointments: React.FC = () => {
           </span>
         )}
         {appointmentsList && (
-          <TableList
-            columns={columns}
-            rows={appointmentsList}
-            redirect={SCREEN_PATHS.appointments}
-          />
+          <S.TableContainer>
+            <TableList
+              columns={columns}
+              rows={appointmentsList}
+              redirect={SCREEN_PATHS.appointments}
+            />
+          </S.TableContainer>
         )}
       </S.main>
     </PageWrapper>

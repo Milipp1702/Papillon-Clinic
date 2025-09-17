@@ -1,4 +1,4 @@
-package br.edu.ifrs.canoas.papillon_clinic.domain.professional;
+package br.edu.ifrs.canoas.papillon_clinic.domain.shift;
 
 import java.time.LocalTime;
 

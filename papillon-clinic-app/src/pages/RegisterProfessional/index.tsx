@@ -14,25 +14,8 @@ import { useNavigate, useParams } from 'react-router-dom';
 import * as S from './styles';
 import { professionalToFormData } from '../../services/mappers';
 import { SCREEN_PATHS } from '../../constants/paths';
-
-const SPECIALITY_OPTIONS = [
-  'TO',
-  'MUSICOTERAPIA',
-  'PSICOLOGIA',
-  'FONOAUDIOLOGIA',
-  'PSICOPEDAGOGIA',
-];
-
-const WORKDAYS = [
-  'Segunda-feira',
-  'Terça-feira',
-  'Quarta-feira',
-  'Quinta-feira',
-  'Sexta-feira',
-  'Sábado',
-];
-
-const WORKSHIFT = ['Manhã', 'Tarde'];
+import WorkdaySelector from './WorkdaySelector';
+import { Workday } from '../../services/dtos';
 
 type FormProfessionalData = {
   id?: string;
@@ -40,10 +23,14 @@ type FormProfessionalData = {
   cpf: string;
   crm: string;
   phone_number: string;
-  speciality: string;
+  specialty_id: string;
   discount: number;
-  workdays: string[];
-  workshift: string[];
+  workdays: Workday[];
+};
+
+type WorkdayWithShift = {
+  workday_id: string;
+  shift_id: string;
 };
 
 const formErrors: dataFormat = {
@@ -63,7 +50,7 @@ const formErrors: dataFormat = {
     min: 'Número inválido!',
     matches: 'Número de telefone deve possuir apenas números!',
   },
-  speciality: {
+  specialty: {
     required: 'Informe a especialidade!',
   },
   discount: {
@@ -72,9 +59,6 @@ const formErrors: dataFormat = {
   workdays: {
     required: 'Informe os dias de trabalho!',
   },
-  workshift: {
-    required: 'Informe os turnos de trabalho!',
-  },
 };
 
 const RegisterProfessional: React.FC = () => {
@@ -82,11 +66,20 @@ const RegisterProfessional: React.FC = () => {
   const [professional, setProfessional] = useState<FormProfessionalData | null>(
     null
   );
+  const [specialties, setSpecialties] = useState<
+    { id: string; name: string }[] | null
+  >([]);
   const navigate = useNavigate();
   const { id } = useParams();
-
-  const { registerProfessional, updateProfessional, findProfessionalById } =
-    useClinicApi();
+  const [selectedWorkdays, setSelectedWorkdays] = useState<WorkdayWithShift[]>(
+    []
+  );
+  const {
+    registerProfessional,
+    updateProfessional,
+    findProfessionalById,
+    getSpecialties,
+  } = useClinicApi();
 
   const ProfessionalSchema = object({
     name: string().trim().required(),
@@ -98,24 +91,36 @@ const RegisterProfessional: React.FC = () => {
       .matches(ONLY_NUMBERS)
       .min(11)
       .max(11),
-    speciality: string().trim().required(),
+    specialty_id: string().trim().required(),
     discount: number().required(),
-    workdays: array().of(string().trim().required()).required(),
-    workshift: array().of(string().trim().required()).required(),
+    workdays: array()
+      .of(
+        object({
+          workday_id: string().trim().required(),
+          shift_id: string().trim().required(),
+        })
+      )
+      .required(),
   });
 
   const {
     register,
     reset,
     handleSubmit,
+    setValue,
     formState: { errors },
   } = useForm<FormProfessionalData>({
     resolver: yupResolver(ProfessionalSchema),
     values: { ...professional } as FormProfessionalData,
   });
 
+  console.log(errors);
+
   const onSubmit = async (data: FormProfessionalData) => {
-    const professional = data;
+    const professional = {
+      ...data,
+      workdays: selectedWorkdays,
+    };
 
     if (id) {
       try {
@@ -126,6 +131,7 @@ const RegisterProfessional: React.FC = () => {
       }
     } else {
       try {
+        console.log(professional);
         await registerProfessional(professional);
         setSuccess((current) => !current);
         reset();
@@ -135,19 +141,36 @@ const RegisterProfessional: React.FC = () => {
     }
   };
 
+  const getSpecialtiesData = async () => {
+    try {
+      const response = await getSpecialties();
+
+      setSpecialties(response);
+    } catch (error) {
+      console.log('error' + error);
+      //setError('Erro ao buscar especialidades.');
+    }
+  };
+
   const getProfessionalData = async (id: string) => {
     try {
       const response = await findProfessionalById(id);
       setProfessional(professionalToFormData(response));
+      setSelectedWorkdays(response.workdays);
     } catch (error) {
       console.log('error' + error);
     }
   };
 
   useEffect(() => {
+    setValue('workdays', selectedWorkdays);
+  }, [selectedWorkdays]);
+
+  useEffect(() => {
     if (id) {
       getProfessionalData(id);
     }
+    getSpecialtiesData();
   }, []);
 
   return (
@@ -195,21 +218,21 @@ const RegisterProfessional: React.FC = () => {
               <label htmlFor="speciality">Especialidade</label>
               <S.Select
                 defaultValue={''}
-                id="speciality"
-                {...register('speciality')}
+                id="specialty_id"
+                {...register('specialty_id')}
               >
                 <option value="" disabled>
                   Selecione...
                 </option>
-                {SPECIALITY_OPTIONS.map((speciality, index) => (
-                  <option key={index + 'speciality'} value={speciality}>
-                    {speciality}
+                {specialties?.map((speciality, index) => (
+                  <option key={index + 'speciality'} value={speciality.id}>
+                    {speciality.name}
                   </option>
                 ))}
               </S.Select>
-              {errors.speciality?.type && (
+              {errors.specialty_id?.type && (
                 <InputError>
-                  {formErrors['speciality'][errors.speciality?.type]}
+                  {formErrors['specialty_id'][errors.specialty_id?.type]}
                 </InputError>
               )}
             </S.InputContainer>
@@ -223,49 +246,10 @@ const RegisterProfessional: React.FC = () => {
               )}
             </S.InputContainer>
           </S.Fieldset>
-          <S.InputContainer>
-            <label htmlFor="workdays">Dias de Trabalho</label>
-            <S.CheckboxGroup>
-              {WORKDAYS.map((day, index) => (
-                <div key={index}>
-                  <input
-                    type="checkbox"
-                    id={`workday-${index}`}
-                    value={day}
-                    {...register('workdays')}
-                  />
-                  <label htmlFor={`workday-${index}`}>{day}</label>
-                </div>
-              ))}
-            </S.CheckboxGroup>
-            {errors.workdays?.type && (
-              <InputError>
-                {formErrors['workdays'][errors.workdays?.type]}
-              </InputError>
-            )}
-          </S.InputContainer>
-
-          <S.InputContainer>
-            <label htmlFor="workshift">Turnos</label>
-            <S.CheckboxGroup>
-              {WORKSHIFT.map((shift, index) => (
-                <div key={index}>
-                  <input
-                    type="checkbox"
-                    id={`workshift-${index}`}
-                    value={shift}
-                    {...register('workshift')}
-                  />
-                  <label htmlFor={`workshift-${index}`}>{shift}</label>
-                </div>
-              ))}
-            </S.CheckboxGroup>
-            {errors.workshift?.type && (
-              <InputError>
-                {formErrors['workshift'][errors.workshift?.type]}
-              </InputError>
-            )}
-          </S.InputContainer>
+          <WorkdaySelector
+            selected={selectedWorkdays}
+            onChange={setSelectedWorkdays}
+          />
           {success && (
             <S.SuccessMessage>Profissional Cadastrado!</S.SuccessMessage>
           )}

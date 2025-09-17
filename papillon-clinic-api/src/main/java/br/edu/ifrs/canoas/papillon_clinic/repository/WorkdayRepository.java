@@ -1,6 +1,6 @@
 package br.edu.ifrs.canoas.papillon_clinic.repository;
 
-import br.edu.ifrs.canoas.papillon_clinic.domain.professional.WorkDay;
+import br.edu.ifrs.canoas.papillon_clinic.domain.workday.WorkDay;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

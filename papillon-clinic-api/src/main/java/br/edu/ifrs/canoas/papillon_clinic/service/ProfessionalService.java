@@ -1,9 +1,12 @@
 package br.edu.ifrs.canoas.papillon_clinic.service;
 
 import br.edu.ifrs.canoas.papillon_clinic.domain.professional.*;
+import br.edu.ifrs.canoas.papillon_clinic.domain.shift.Shift;
+import br.edu.ifrs.canoas.papillon_clinic.domain.workday.WorkDay;
 import br.edu.ifrs.canoas.papillon_clinic.mapper.ProfessionalMapper;
 import br.edu.ifrs.canoas.papillon_clinic.mapper.ProfessionalWorkdayMapper;
 import br.edu.ifrs.canoas.papillon_clinic.repository.ProfessionalRepository;
+import br.edu.ifrs.canoas.papillon_clinic.repository.ProfessionalWorkdayRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -25,6 +28,9 @@ public class ProfessionalService {
 
     @Autowired
     ShiftService shiftService;
+
+    @Autowired
+    ProfessionalWorkdayRepository professionalWorkdayRepository;
 
     public Optional<Professional> getById(String id){
         return repository.findById(id);
@@ -75,6 +81,8 @@ public class ProfessionalService {
         if(specialty.isEmpty()){
             throw new Exception("Specialty not Found");
         }
+        System.out.println(professionalDTO.workdays());
+        System.out.println(professionalDTO.workdays().get(0).id());
         List<ProfessionalWorkday> workdays = professionalDTO.workdays().stream()
                 .map(dto -> {
                     System.out.println("help");

@@ -15,16 +15,20 @@ export type PatientDTO = {
   listGuardian: Guardian[];
 };
 
+export type Workday = {
+  workday_id: string;
+  shift_id: string;
+};
+
 export type ProfessionalDTO = {
   id?: string;
   name: string;
   cpf: string;
   crm: string;
   phone_number: string;
-  speciality: string;
+  specialty_id: string;
   discount: number;
-  workdays: string[];
-  workshift: string[];
+  workdays: Workday[];
 };
 
 export type PatientListDTO = {
@@ -41,22 +45,26 @@ export type ProfessionalListDTO = {
   crm: string;
 };
 
+type Frequency = {
+  id?: string;
+  end_date?: string;
+  frequency?: string;
+  frequency_interval?: string;
+  email_reminder?: boolean;
+};
+
 export type AppointmentDTO = {
   id?: string;
   appointment_date: string;
-  patient_id: string;
-  appointment_type_id: string;
-  specialty_id?: string;
+  patientId: string;
+  appointmentTypeId: string;
   payment_type: string;
-  professional_id: string;
+  professionalId: string;
+  specialtyId?: string;
+  professionalName?: string;
   payment_date?: string;
   observation: string;
-  appointment_frequency?: {
-    end_date: string;
-    frequency: string;
-    frequency_interval?: number;
-    email_reminder?: boolean;
-  };
+  frequency?: Frequency;
 };
 
 export type AppointmentListDTO = {
@@ -68,6 +76,14 @@ export type AppointmentListDTO = {
   isPaid: boolean;
 };
 
+export type AvailableSlotsDTO = {
+  date: string;
+  time: string;
+  professionalName?: string;
+  professionalId: string;
+  specialtyId: string;
+};
+
 export type AppointmentTypeListDTO = {
   id: string;
   name: string;
@@ -77,6 +93,12 @@ export type AppointmentTypeListDTO = {
 export type SpecialtyListDTO = {
   id: string;
   name: string;
+};
+
+export type WorkdayWithShiftsDTO = {
+  id: string;
+  name: string;
+  shifts: { id: string; shift: string; start_time: string; end_time: string }[];
 };
 
 export type Page<T> = {

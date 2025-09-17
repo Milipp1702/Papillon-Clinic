@@ -1,9 +1,9 @@
 package br.edu.ifrs.canoas.papillon_clinic.domain.professional;
 
+import br.edu.ifrs.canoas.papillon_clinic.domain.shift.Shift;
+import br.edu.ifrs.canoas.papillon_clinic.domain.workday.WorkDay;
 import jakarta.persistence.*;
 import lombok.*;
-
-import java.util.UUID;
 
 
 @Entity(name = "professional_workdays")
