@@ -1,6 +1,10 @@
 package br.edu.ifrs.canoas.papillon_clinic.mapper;
 
 import br.edu.ifrs.canoas.papillon_clinic.domain.professional.*;
+import br.edu.ifrs.canoas.papillon_clinic.domain.shift.Shift;
+import br.edu.ifrs.canoas.papillon_clinic.domain.shift.ShiftDTO;
+import br.edu.ifrs.canoas.papillon_clinic.domain.workday.WorkDay;
+import br.edu.ifrs.canoas.papillon_clinic.domain.workday.WorkDayDTO;
 
 public class ProfessionalWorkdayMapper {
 

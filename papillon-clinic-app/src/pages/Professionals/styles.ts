@@ -34,3 +34,8 @@ export const InputContainer = styled.div`
     height: 44px;
   }
 `;
+
+export const TableContainer = styled.div`
+  max-height: 55vh;
+  overflow-y: auto;
+`;

@@ -1,9 +1,9 @@
 package br.edu.ifrs.canoas.papillon_clinic.repository;
 
 import br.edu.ifrs.canoas.papillon_clinic.domain.professional.Professional;
-import br.edu.ifrs.canoas.papillon_clinic.domain.professional.ProfessionalResponseDTO;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -14,4 +14,15 @@ public interface ProfessionalRepository extends JpaRepository<Professional,Strin
     List<Professional> getTop6Professional();
 
     List<Professional> findBySpecialtyId(String specialtyId);
+
+    @Query("SELECT p.name FROM professionals p WHERE p.id = :id")
+    String findNameById(@Param("id") String id);
+
+    @Query("SELECT p.specialty.id FROM professionals p WHERE p.id = :id")
+    String findSpecialtyById(@Param("id") String id);
+
+    List<String> findIdsBySpecialtyId(String specialtyId);
+
+    @Query("SELECT p.id FROM professionals p")
+    List<String> findAllIds();
 }

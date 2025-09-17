@@ -3,10 +3,18 @@ import styled from 'styled-components';
 export const GuardianTable = styled.table`
   font-weight: bold;
   border-spacing: 0;
+  border-collapse: collapse;
   width: 100%;
 
   thead {
     text-align: left;
+  }
+
+  thead th {
+    position: sticky;
+    top: 0;
+    z-index: 2;
+    background-color: #fff;
   }
 
   tr {
@@ -21,6 +29,12 @@ export const GuardianTable = styled.table`
     height: 100%;
     text-align: center;
     border-left: 1px solid ${({ theme }) => theme.colors.grey[300]};
+  }
+
+  tbody {
+    max-height: 100%;
+    overflow-y: auto;
+    position: relative;
   }
 
   tr.grey {

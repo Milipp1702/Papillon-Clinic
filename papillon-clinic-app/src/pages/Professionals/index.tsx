@@ -21,7 +21,7 @@ const Professionals: React.FC = () => {
   const [professionalList, setprofessionalList] = useState<any[] | null>(null);
   const { getProfessionals } = useClinicApi();
 
-  const getPatientsData = async () => {
+  const getProfessionalsData = async () => {
     try {
       const response = await getProfessionals();
 
@@ -33,7 +33,7 @@ const Professionals: React.FC = () => {
   };
 
   useEffect(() => {
-    getPatientsData();
+    getProfessionalsData();
   }, []);
 
   return (
@@ -62,11 +62,13 @@ const Professionals: React.FC = () => {
           </span>
         )}
         {professionalList && (
-          <TableList
-            columns={columns}
-            rows={professionalList}
-            redirect={SCREEN_PATHS.professionals}
-          />
+          <S.TableContainer>
+            <TableList
+              columns={columns}
+              rows={professionalList}
+              redirect={SCREEN_PATHS.professionals}
+            />
+          </S.TableContainer>
         )}
       </S.main>
     </PageWrapper>

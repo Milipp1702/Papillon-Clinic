@@ -15,16 +15,20 @@ export type PatientDTO = {
   listGuardian: Guardian[];
 };
 
+export type Workday = {
+  workday_id: string;
+  shift_id: string;
+};
+
 export type ProfessionalDTO = {
   id?: string;
   name: string;
   cpf: string;
   crm: string;
   phone_number: string;
-  speciality: string;
+  specialty_id: string;
   discount: number;
-  workdays: string[];
-  workshift: string[];
+  workdays: Workday[];
 };
 
 export type PatientListDTO = {
@@ -77,6 +81,12 @@ export type AppointmentTypeListDTO = {
 export type SpecialtyListDTO = {
   id: string;
   name: string;
+};
+
+export type WorkdayWithShiftsDTO = {
+  id: string;
+  name: string;
+  shifts: { id: string; shift: string; start_time: string; end_time: string }[];
 };
 
 export type Page<T> = {

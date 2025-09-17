@@ -1,4 +1,4 @@
-import { useContext, useMemo, useState } from 'react';
+import { useContext, useMemo } from 'react';
 import { useHttp } from './base/useHttp';
 import { AuthContext, User } from '../../context/AuthContext';
 import {
@@ -11,6 +11,7 @@ import {
   ProfessionalListDTO,
   AppointmentTypeListDTO,
   SpecialtyListDTO,
+  WorkdayWithShiftsDTO,
 } from '../dtos';
 
 export type AuthData = {
@@ -47,6 +48,7 @@ interface IRoutes {
   getNumberOfProfessionals: () => Promise<number>;
   getNumberOfPatients: () => Promise<number>;
   getNumberOfAppointments: () => Promise<number>;
+  getAllWorkdaysWithShifts: () => Promise<WorkdayWithShiftsDTO[]>;
   findPatientById: (id: string) => Promise<PatientDTO>;
   findProfessionalById: (id: string) => Promise<ProfessionalDTO>;
   verifyToken: () => Promise<string>;
@@ -147,6 +149,12 @@ export const useClinicApi = () => {
     return await httpInstance.get<number>('/appointment/getAmount');
   }
 
+  async function getAllWorkdaysWithShifts() {
+    return await httpInstance.get<WorkdayWithShiftsDTO[]>(
+      '/workday/getWorkdaysWithShifts'
+    );
+  }
+
   async function findPatientById(id: string) {
     return await httpInstance.get<PatientDTO>(`/patient/${id}`);
   }
@@ -181,6 +189,7 @@ export const useClinicApi = () => {
         getNumberOfProfessionals,
         getNumberOfPatients,
         getNumberOfAppointments,
+        getAllWorkdaysWithShifts,
         findPatientById,
         updatePatient,
         updateProfessional,

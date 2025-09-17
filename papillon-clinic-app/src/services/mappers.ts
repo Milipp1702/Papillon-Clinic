@@ -35,10 +35,14 @@ type ProfessionalFormData = {
   cpf: string;
   crm: string;
   phone_number: string;
-  speciality: string;
+  specialty_id: string;
   discount: number;
-  workdays: string[];
-  workshift: string[];
+  workdays: {
+    workday_id: string;
+    shift_id: string;
+  }[];
+};
+
 };
 
 export const patientMapper = (data: PatientForm): PatientDTO => {
@@ -78,7 +82,7 @@ export const professionalToFormData = (
     cpf: data.cpf,
     crm: data.crm,
     phone_number: data.phone_number,
-    speciality: data.speciality,
+    specialty_id: data.specialty_id,
     discount: data.discount,
     workdays: data.workdays,
     workshift: data.workshift,

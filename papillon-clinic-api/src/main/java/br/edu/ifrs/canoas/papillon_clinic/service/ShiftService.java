@@ -1,6 +1,6 @@
 package br.edu.ifrs.canoas.papillon_clinic.service;
 
-import br.edu.ifrs.canoas.papillon_clinic.domain.professional.Shift;
+import br.edu.ifrs.canoas.papillon_clinic.domain.shift.Shift;
 import br.edu.ifrs.canoas.papillon_clinic.repository.ShiftRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
