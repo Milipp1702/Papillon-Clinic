@@ -6,6 +6,12 @@ export const main = styled.main`
   overflow: auto;
   margin: 0 auto;
   max-width: 90%;
+
+  .new-appointment-button {
+    padding: 0 20px;
+    width: 254px;
+    max-width: 254px;
+  }
 `;
 
 export const Options = styled.div`
@@ -33,4 +39,9 @@ export const InputContainer = styled.div`
   :first-child {
     height: 44px;
   }
+`;
+
+export const TableContainer = styled.div`
+  max-height: 55vh;
+  overflow-y: auto;
 `;
