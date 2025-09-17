@@ -5,6 +5,7 @@ export const SCREEN_PATHS = {
   patients: '/patients',
   professional: '/professionals/:id',
   professionals: '/professionals',
+  appointment: '/appointments/:id',
   appointments: '/appointments',
   registerPatient: '/patients/register',
   registerProfessional: '/professional/register',
