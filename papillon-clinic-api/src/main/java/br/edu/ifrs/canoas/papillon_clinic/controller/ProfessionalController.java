@@ -85,5 +85,9 @@ public class ProfessionalController {
         return ResponseEntity.ok(slots);
     }
 
-
+    @GetMapping("getIdByUser")
+    @ResponseStatus(HttpStatus.OK)
+    public ResponseEntity<String> getIdByUser(String userId){
+        return ResponseEntity.ok(service.getIdByUser(userId));
+    }
 }

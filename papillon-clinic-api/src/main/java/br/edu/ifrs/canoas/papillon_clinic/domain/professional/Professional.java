@@ -2,6 +2,7 @@ package br.edu.ifrs.canoas.papillon_clinic.domain.professional;
 
 
 import br.edu.ifrs.canoas.papillon_clinic.domain.appointment.Appointment;
+import br.edu.ifrs.canoas.papillon_clinic.domain.user.User;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -37,6 +38,10 @@ public class Professional {
 
     @Column
     private double discount;
+
+    @OneToOne
+    @JoinColumn(name = "user_id")
+    private User user;
 
     @OneToMany(mappedBy = "professional", cascade = CascadeType.ALL)
     private List<Appointment> listAppointments;

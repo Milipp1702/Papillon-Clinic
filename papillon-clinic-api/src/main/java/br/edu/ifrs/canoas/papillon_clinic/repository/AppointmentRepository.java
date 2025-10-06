@@ -13,4 +13,6 @@ public interface AppointmentRepository extends JpaRepository<Appointment,String>
     List<Appointment> findByAppointmentDateBetween(LocalDate firstDayOfMonth, LocalDate lastDayOfMonth);
 
     List<Appointment> findByFrequency_IdAndAppointmentDateAfter(String frequencyId, LocalDateTime date);
+
+    List<Appointment> findByProfessional_IdIn(List<String> professionalIds);
 }

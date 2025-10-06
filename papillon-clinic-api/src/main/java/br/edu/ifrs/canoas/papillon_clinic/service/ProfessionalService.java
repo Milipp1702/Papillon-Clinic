@@ -2,6 +2,7 @@ package br.edu.ifrs.canoas.papillon_clinic.service;
 
 import br.edu.ifrs.canoas.papillon_clinic.domain.professional.*;
 import br.edu.ifrs.canoas.papillon_clinic.domain.shift.Shift;
+import br.edu.ifrs.canoas.papillon_clinic.domain.user.User;
 import br.edu.ifrs.canoas.papillon_clinic.domain.workday.WorkDay;
 import br.edu.ifrs.canoas.papillon_clinic.mapper.ProfessionalMapper;
 import br.edu.ifrs.canoas.papillon_clinic.mapper.ProfessionalWorkdayMapper;
@@ -10,10 +11,13 @@ import br.edu.ifrs.canoas.papillon_clinic.repository.ProfessionalWorkdayReposito
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class ProfessionalService {
@@ -28,6 +32,9 @@ public class ProfessionalService {
 
     @Autowired
     ShiftService shiftService;
+
+    @Autowired
+    AuthorizationService userService;
 
     @Autowired
     ProfessionalWorkdayRepository professionalWorkdayRepository;
@@ -76,28 +83,25 @@ public class ProfessionalService {
         repository.save(newProfessional);
     }
 
-    public void registerProfessional(ProfessionalDTO professionalDTO) throws Exception {
-        Optional<Specialty> specialty = specialtyService.getById(professionalDTO.specialty_id());
-        if(specialty.isEmpty()){
-            throw new Exception("Specialty not Found");
-        }
-        System.out.println(professionalDTO.workdays());
-        System.out.println(professionalDTO.workdays().get(0).id());
-        List<ProfessionalWorkday> workdays = professionalDTO.workdays().stream()
-                .map(dto -> {
-                    System.out.println("help");
-                    WorkDay workday = workdayService.getWorkdayById(dto.workday_id());
-                    System.out.println(workday);
-                    Shift shift = shiftService.getShiftById(dto.shift_id());
-                    System.out.println(shift);
+    public void registerProfessional(ProfessionalDTO dto) throws Exception {
+        Specialty specialty = specialtyService.getById(dto.specialty_id())
+                .orElseThrow(() -> new Exception("Especialidade não encontrada"));
+
+        User user = userService.registerUser(dto.email());
+
+        List<ProfessionalWorkday> workdays = dto.workdays().stream()
+                .map(wd -> {
+                    WorkDay workday = workdayService.getWorkdayById(wd.workday_id());
+                    Shift shift = shiftService.getShiftById(wd.shift_id());
                     return ProfessionalWorkdayMapper.fromDtoToEntity(workday, shift);
                 })
                 .toList();
 
-        Professional newProfessional = ProfessionalMapper.fromDtoToEntity(professionalDTO, specialty.get(), workdays);
-        workdays.forEach(workday -> workday.setProfessional(newProfessional));
+        Professional professional = ProfessionalMapper.fromDtoToEntity(dto, specialty, workdays);
+        professional.setUser(user);
+        workdays.forEach(wd -> wd.setProfessional(professional));
 
-        repository.save(newProfessional);
+        repository.save(professional);
     }
     public Page<ProfessionalResponseDTO> getListProfessionals(Pageable pagination){
         return repository.findAll(pagination).map(ProfessionalMapper::fromEntityToDtoResponse);
@@ -113,5 +117,11 @@ public class ProfessionalService {
 
     public List<ProfessionalResponseDTO> getProfessionalsBySpecialty(String specialty_id){
         return repository.findBySpecialtyId(specialty_id).stream().map(ProfessionalMapper::fromEntityToDtoResponse).toList();
+    }
+
+    public String getIdByUser(String userId) {
+        return repository.findByUserId(userId)
+                .map(Professional::getId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Profissional não encontrado"));
     }
 }
