@@ -1,4 +1,4 @@
-import { ReactNode } from 'react';
+import { ReactNode, useEffect } from 'react';
 import SideBar from '../Sidebar';
 import { usePersistedState } from '../../utils/usePersistedState';
 import * as S from './styles';
@@ -13,6 +13,14 @@ const PageWrapper: React.FC<Props> = ({ children }) => {
   const handleMenu = () => {
     setOpen(!open);
   };
+
+  useEffect(() => {
+    const timeout = setTimeout(() => {
+      window.dispatchEvent(new Event('resize'));
+    }, 200);
+
+    return () => clearTimeout(timeout);
+  }, [open]);
 
   return (
     <>

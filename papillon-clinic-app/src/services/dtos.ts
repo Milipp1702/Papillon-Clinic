@@ -24,6 +24,7 @@ export type ProfessionalDTO = {
   id?: string;
   name: string;
   cpf: string;
+  email: string;
   crm: string;
   phone_number: string;
   specialty_id: string;
@@ -69,11 +70,12 @@ export type AppointmentDTO = {
 
 export type AppointmentListDTO = {
   id: string;
-  date: string;
-  patient: string;
-  professional: string;
-  type: string;
+  appointmentDate: string;
+  patientName: string;
+  professionalName: string;
+  typeName: string;
   isPaid: boolean;
+  specialtyName: string;
 };
 
 export type AvailableSlotsDTO = {

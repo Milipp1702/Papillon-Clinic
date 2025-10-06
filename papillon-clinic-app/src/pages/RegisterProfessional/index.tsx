@@ -21,6 +21,7 @@ type FormProfessionalData = {
   id?: string;
   name: string;
   cpf: string;
+  email: string;
   crm: string;
   phone_number: string;
   specialty_id: string;
@@ -39,6 +40,9 @@ const formErrors: dataFormat = {
   },
   crm: {
     required: 'Informe o CRM!',
+  },
+  email: {
+    required: 'Informe um email válido!',
   },
   cpf: {
     required: 'Informe o CPF!',
@@ -85,6 +89,7 @@ const RegisterProfessional: React.FC = () => {
     name: string().trim().required(),
     crm: string().trim().required(),
     cpf: string().trim().required().matches(ONLY_NUMBERS).min(11).max(11),
+    email: string().trim().required().email('Email inválido!'),
     phone_number: string()
       .trim()
       .required()
@@ -199,6 +204,15 @@ const RegisterProfessional: React.FC = () => {
               )}
             </S.InputContainer>
             <S.InputContainer>
+              <label htmlFor="email">Email</label>
+              <Input id="email" type="email" {...register('email')} />
+              {errors.email?.type && (
+                <InputError>
+                  {formErrors['email'][errors.email?.type]}
+                </InputError>
+              )}
+            </S.InputContainer>
+            <S.InputContainer>
               <label htmlFor="crm">CRM</label>
               <Input id="crm" {...register('crm')} />
               {errors.crm?.type && (
@@ -254,7 +268,7 @@ const RegisterProfessional: React.FC = () => {
             <S.SuccessMessage>Profissional Cadastrado!</S.SuccessMessage>
           )}
           <Button className="button-register" variant="terciary" type="submit">
-            Cadastrar
+            {id ? 'Salvar' : 'Cadastrar'}
           </Button>
         </S.Form>
       </S.Main>

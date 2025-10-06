@@ -10,4 +10,5 @@ export const SCREEN_PATHS = {
   registerPatient: '/patients/register',
   registerProfessional: '/professional/register',
   registerAppointment: '/appointments/register',
+  calendar: '/calendar',
 };
