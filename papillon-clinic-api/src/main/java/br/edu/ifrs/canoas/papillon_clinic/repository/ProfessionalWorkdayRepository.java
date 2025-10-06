@@ -9,6 +9,8 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.sql.Time;
+import java.time.LocalDate;
 import java.util.List;
 
 @Repository
@@ -35,6 +37,11 @@ public interface ProfessionalWorkdayRepository extends JpaRepository<Professiona
             "AND DATE(a.appointment_date) BETWEEN DATE(NOW()) AND DATE_ADD(DATE(NOW()), INTERVAL 1 MONTH)",
             nativeQuery = true)
     List<String> findBookedAppointments(@Param("professionalId") String professionalId);
+
+    @Query(value = "SELECT TIME(a.appointment_date) FROM appointments a " +
+            "WHERE a.professional_id = :professionalId " +
+            "AND DATE(a.appointment_date) = :date", nativeQuery = true)
+    List<Time> findBookedTimes(@Param("professionalId") String professionalId, @Param("date") LocalDate date);
 
     @Query(value = "SELECT s.start_time, s.end_time FROM shifts s " +
             "JOIN professional_workdays pw ON pw.shift_id = s.id " +

@@ -30,7 +30,8 @@ public class AppointmentMapper {
                 appointment.getPatient().getName(),
                 appointment.getAppointmentTypes().getName(),
                 appointment.getAppointmentDate(),
-                appointment.isPaid()
+                appointment.isPaid(),
+                appointment.getProfessional().getSpecialty().getName()
                 );
     }
 
@@ -59,6 +60,5 @@ public class AppointmentMapper {
                 specialtyId,
                 professionalName
         );
-
     }
 }
