@@ -1,1 +1,0 @@
-ALTER TABLE professionals RENAME COLUMN specialty TO specialty_id;
