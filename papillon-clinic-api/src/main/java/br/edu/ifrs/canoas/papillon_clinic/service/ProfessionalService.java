@@ -108,6 +108,12 @@ public class ProfessionalService {
         return repository.findAll(pagination).map(ProfessionalMapper::fromEntityToDtoResponse);
     }
 
+    public List<ProfessionalResponseDTO> getAllProfessionals() {
+        return repository.findAll().stream()
+                .map(ProfessionalMapper::fromEntityToDtoResponse)
+                .collect(Collectors.toList());
+    }
+
     public long getQuantityProfessionals(){
         return repository.count();
     }
