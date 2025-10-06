@@ -70,6 +70,12 @@ public class ProfessionalController {
         return ResponseEntity.ok(service.getProfessionalsBySpecialty(specialty_id));
     }
 
+    @GetMapping("getAllProfessionals")
+    @ResponseStatus(HttpStatus.OK)
+    public ResponseEntity<List<ProfessionalResponseDTO>> getAllProfessionals(){
+        return ResponseEntity.ok(service.getAllProfessionals());
+    }
+
     @GetMapping("all-available-slots")
     public ResponseEntity<List<AvailableSlot>> getAllAvailableSlots(
             @RequestParam(required = false) List<String> ids,
@@ -85,5 +91,9 @@ public class ProfessionalController {
         return ResponseEntity.ok(slots);
     }
 
-
+    @GetMapping("getIdByUser")
+    @ResponseStatus(HttpStatus.OK)
+    public ResponseEntity<String> getIdByUser(String userId){
+        return ResponseEntity.ok(service.getIdByUser(userId));
+    }
 }

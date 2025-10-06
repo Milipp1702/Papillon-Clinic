@@ -19,10 +19,4 @@ public class AppointmentTypesService {
     public Optional<AppointmentTypes> getById(String id){
         return repository.findById(id);
     }
-
-    public List<AppointmentTypeDTO> getListTypes() {
-        return repository.findAll().stream()
-                .map(AppointmentTypeMapper::fromEntityToDto)
-                .collect(Collectors.toList());
-    }
 }

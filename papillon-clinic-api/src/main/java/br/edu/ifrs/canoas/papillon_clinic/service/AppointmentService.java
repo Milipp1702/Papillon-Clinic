@@ -300,6 +300,20 @@ public class AppointmentService {
         return repository.findAll(pagination).map(AppointmentMapper::fromEntityToDtoResponse);
     }
 
+    public List<AppointmentResponseDTO> getAppointmentsForCalendar(List<String> professionalIds) {
+        List<Appointment> appointments;
+
+        if (professionalIds == null || professionalIds.isEmpty()) {
+            appointments = repository.findAll();
+        } else {
+            appointments = repository.findByProfessional_IdIn(professionalIds);
+        }
+
+        return appointments.stream()
+                .map(AppointmentMapper::fromEntityToDtoResponse)
+                .collect(Collectors.toList());
+    }
+
     public long getQuantityAppointments(){
         return repository.findByAppointmentDateBetween(LocalDate.now().with(TemporalAdjusters.firstDayOfMonth()),LocalDate.now()).size();
     }

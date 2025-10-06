@@ -56,6 +56,11 @@ interface IRoutes {
     date: string
   ) => Promise<AvailableSlotsDTO[]>;
   getAllWorkdaysWithShifts: () => Promise<WorkdayWithShiftsDTO[]>;
+  getAppointmentsForCalendar: (
+    professionalIds?: String[]
+  ) => Promise<AppointmentListDTO[]>;
+  getAllProfessionals: () => Promise<ProfessionalListDTO[]>;
+  getProfessionalIdByUser: (userId: String) => Promise<String>;
   findPatientById: (id: string) => Promise<PatientDTO>;
   findProfessionalById: (id: string) => Promise<ProfessionalDTO>;
   findAppointmentById: (id: string) => Promise<AppointmentDTO>;
@@ -123,6 +128,12 @@ export const useClinicApi = () => {
     );
   }
 
+  async function getAllProfessionals() {
+    return await httpInstance.get<ProfessionalListDTO[]>(
+      `/professional/getAllProfessionals`
+    );
+  }
+
   async function getProfessionalsBySpecialty(specialty_id: string) {
     return await httpInstance.get<ProfessionalListDTO[]>(
       `/professional/getBySpecialty?specialty_id=${specialty_id}`
@@ -167,6 +178,12 @@ export const useClinicApi = () => {
     );
   }
 
+  async function getProfessionalIdByUser(userId: String) {
+    return await httpInstance.get<String>(
+      `/professional/getIdByUser?userId=${userId}`
+    );
+  }
+
   async function getAllAvailableSlots(
     professionalIds: string[],
     specialty?: string,
@@ -183,9 +200,20 @@ export const useClinicApi = () => {
     }
 
     const url = `/professional/all-available-slots?${queryParams.join('&')}`;
-    console.log('URL:', url);
 
     return await httpInstance.get<AvailableSlotsDTO[]>(url);
+  }
+
+  async function getAppointmentsForCalendar(professionalIds?: String[]) {
+    let queryParams = '';
+
+    if (professionalIds !== undefined && professionalIds.length > 0) {
+      queryParams = `?professionalIds=${professionalIds?.join(',')}`;
+    }
+    console.log(queryParams);
+    const url = `/appointment/getAppointmentsForCalendar${queryParams}`;
+
+    return await httpInstance.get<AppointmentListDTO[]>(url);
   }
 
   async function findPatientById(id: string) {
@@ -228,6 +256,9 @@ export const useClinicApi = () => {
         getNumberOfAppointments,
         getAllAvailableSlots,
         getAllWorkdaysWithShifts,
+        getProfessionalIdByUser,
+        getAppointmentsForCalendar,
+        getAllProfessionals,
         findPatientById,
         findAppointmentById,
         updatePatient,

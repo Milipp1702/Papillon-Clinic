@@ -87,6 +87,7 @@ const RegisterAppointment: React.FC = () => {
     end_date?: string;
   }>({});
   const [specialtyId, setSpecialtyId] = useState('');
+  const [appointmentTypeId, setAppointmentTypeId] = useState('');
   const [showFrequencyModal, setShowFrequencyModal] = useState(false);
   const [frequencyModalResolver, setFrequencyModalResolver] = useState<
     ((value: boolean) => void) | null
@@ -289,6 +290,7 @@ const RegisterAppointment: React.FC = () => {
         specialtyId: response.specialtyId || '',
       };
       changeSelectedSlot(slot);
+      setAppointmentTypeId(response.appointmentTypeId);
       setValue('appointmentTypeId', response.appointmentTypeId);
       setOldFrequency(!!response.frequency?.id);
     } catch (error) {
@@ -344,6 +346,7 @@ const RegisterAppointment: React.FC = () => {
   ) => {
     const selectedValue = event.target.value;
     setValue('appointmentTypeId', selectedValue);
+    setAppointmentTypeId(selectedValue);
     setSpecialtyId('');
   };
 
@@ -421,6 +424,7 @@ const RegisterAppointment: React.FC = () => {
               <S.Select
                 id="appointment_type_id"
                 onChange={(event) => handleChangeAppointmentType(event)}
+                value={appointmentTypeId}
                 disabled={!!selectedSlot}
               >
                 <option value="">Selecione um tipo...</option>

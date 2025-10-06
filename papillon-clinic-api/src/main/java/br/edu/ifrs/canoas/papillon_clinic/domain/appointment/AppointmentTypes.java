@@ -23,12 +23,4 @@ public class AppointmentTypes {
 
     @Column
     private double amount;
-
-    @ManyToMany
-    @JoinTable(
-            name = "specialty_appointment_type",
-            joinColumns = @JoinColumn(name = "appointment_type_id"),
-            inverseJoinColumns = @JoinColumn(name = "specialty_id")
-    )
-    private List<Specialty> specialties;
 }

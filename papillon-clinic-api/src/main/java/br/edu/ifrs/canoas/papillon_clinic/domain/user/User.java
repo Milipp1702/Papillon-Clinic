@@ -1,5 +1,6 @@
 package br.edu.ifrs.canoas.papillon_clinic.domain.user;
 
+import br.edu.ifrs.canoas.papillon_clinic.domain.professional.Professional;
 import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.security.core.GrantedAuthority;
@@ -29,6 +30,9 @@ public class User implements UserDetails {
 
     @Enumerated(EnumType.STRING)
     private UserRole role;
+
+    @OneToOne(mappedBy = "user")
+    private Professional professional;
 
     public User(String login, String password, UserRole role) {
         this.role = role;

@@ -9,6 +9,7 @@ public class ProfessionalMapper {
     public static Professional fromDtoToEntity(ProfessionalDTO dto, Specialty specialty, List<ProfessionalWorkday> workdays){
         Professional professional = new Professional();
         professional.setCpf(dto.cpf());
+        professional.setEmail(dto.email());
         professional.setDiscount(dto.discount());
         professional.setCrm(dto.crm());
         professional.setName(dto.name());
@@ -24,6 +25,6 @@ public class ProfessionalMapper {
 
     public static ProfessionalDTO fromEntityToDto(Professional professional){
         List<ProfessionalWorkdayDTO> workdays = professional.getWorkdays().stream().map(ProfessionalWorkdayMapper::fromEntityToDto).toList();
-        return new ProfessionalDTO(professional.getId(), professional.getName(), professional.getCpf(), professional.getCrm(), professional.getSpecialty().getId(), professional.getPhone_number(), professional.getDiscount(),workdays);
+        return new ProfessionalDTO(professional.getId(), professional.getName(), professional.getCpf(), professional.getEmail(), professional.getCrm(), professional.getSpecialty().getId(), professional.getPhone_number(), professional.getDiscount(),workdays);
     }
 }

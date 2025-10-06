@@ -7,10 +7,12 @@ import br.edu.ifrs.canoas.papillon_clinic.repository.ProfessionalWorkdayReposito
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.sql.Time;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class ProfessionalWorkdayService {
@@ -95,11 +97,13 @@ public class ProfessionalWorkdayService {
             String specialtyId = professionalRepository.findSpecialtyById(professionalId);
 
             List<AvailableDate> availableDates = getAvailableDates(professionalId);
-            List<String> bookedDates = professionalWorkdayRepository.findBookedAppointments(professionalId);
 
             for (AvailableDate availableDate : availableDates) {
                 if (selectedDate != null && !availableDate.date().equals(selectedDate)) continue;
-                if (bookedDates.contains(availableDate.date().toString())) continue;
+
+                List<LocalTime> bookedTimes = professionalWorkdayRepository.findBookedTimes(professionalId, availableDate.date()).stream()
+                        .map(Time::toLocalTime)
+                        .toList();
 
                 List<Object[]> shiftsForDay = professionalWorkdayRepository.findShiftsForDay(professionalId, availableDate.dayName());
                 for (Object[] shift : shiftsForDay) {
@@ -108,12 +112,12 @@ public class ProfessionalWorkdayService {
                     List<LocalTime> times = generateAvailableTimes(startTime, endTime);
 
                     for (LocalTime time : times) {
+                        if (bookedTimes.contains(time)) continue;
                         allSlots.add(new AvailableSlot(availableDate.date(), time, professionalId, professionalName, specialtyId));
                     }
                 }
             }
         }
-
         return allSlots;
     }
 }

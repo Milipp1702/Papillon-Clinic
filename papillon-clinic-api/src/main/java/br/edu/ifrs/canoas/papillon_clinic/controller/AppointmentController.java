@@ -53,4 +53,10 @@ public class AppointmentController {
     public ResponseEntity<Page<AppointmentResponseDTO>> getListAppointments(@PageableDefault() Pageable pagination){
         return ResponseEntity.ok(service.getListAppointments(pagination));
     }
+
+    @GetMapping("getAppointmentsForCalendar")
+    @ResponseStatus(HttpStatus.OK)
+    public ResponseEntity<List<AppointmentResponseDTO>> getAppointmentsForCalendar(@RequestParam(required = false) List<String> professionalIds){
+        return ResponseEntity.ok(service.getAppointmentsForCalendar(professionalIds));
+    }
 }

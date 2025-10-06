@@ -33,6 +33,7 @@ type PatientFormData = {
 type ProfessionalFormData = {
   name: string;
   cpf: string;
+  email: string;
   crm: string;
   phone_number: string;
   specialty_id: string;
@@ -97,6 +98,7 @@ export const professionalToFormData = (
   return {
     name: data.name,
     cpf: data.cpf,
+    email: data.email,
     crm: data.crm,
     phone_number: data.phone_number,
     specialty_id: data.specialty_id,
