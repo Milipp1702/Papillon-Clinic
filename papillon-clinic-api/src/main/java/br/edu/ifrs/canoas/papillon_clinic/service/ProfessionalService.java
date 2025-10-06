@@ -64,6 +64,7 @@ public class ProfessionalService {
         newProfessional.setPhone_number(professional.phone_number());
         newProfessional.setName(professional.name());
         newProfessional.setCpf(professional.cpf());
+        newProfessional.setEmail(professional.email());
         newProfessional.setDiscount(professional.discount());
         newProfessional.setCrm(professional.crm());
         newProfessional.setSpecialty(specialty.get());
