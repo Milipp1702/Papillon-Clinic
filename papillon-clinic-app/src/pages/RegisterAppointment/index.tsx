@@ -222,7 +222,8 @@ const RegisterAppointment: React.FC = () => {
         }
       } catch (error) {
         console.log(error);
-        setError(error.message || 'Erro ao atualizar o atendimento.');
+        const errorObj = error as Error;
+        setError(errorObj.message || 'Erro ao atualizar o atendimento.');
       }
     } else {
       try {
@@ -626,9 +627,6 @@ const RegisterAppointment: React.FC = () => {
                   </>
                 )}
               </S.SecondFieldset>
-              {success && (
-                <S.SuccessMessage>Atendimento Cadastrado!</S.SuccessMessage>
-              )}
               <Button
                 className="button-register"
                 variant="terciary"
@@ -645,7 +643,7 @@ const RegisterAppointment: React.FC = () => {
             </>
           )}
           {success && (
-            <S.SuccessMessage>Profissional Cadastrado!</S.SuccessMessage>
+            <S.SuccessMessage>Atendimento Cadastrado!</S.SuccessMessage>
           )}
           {error && <S.ErrorMessage>{error}</S.ErrorMessage>}
         </S.Form>

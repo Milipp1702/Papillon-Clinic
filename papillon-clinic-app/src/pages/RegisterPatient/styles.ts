@@ -89,6 +89,17 @@ export const AddButtonWrapper = styled.div`
   gap: 15px;
 `;
 
+export const ErrorMessage = styled.span`
+  color: ${({ theme }) => theme.colors.error};
+  font-size: ${({ theme }) => theme.sizes.medium};
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+  margin: 20px 0;
+  width: 100%;
+`;
+
 export const GuardianTable = styled.table`
   font-weight: bold;
   border-spacing: 0;
