@@ -7,10 +7,10 @@ export default defineConfig({
   build: {
     rollupOptions: {
       external: [
-        '@fullcalendar/core',
-        '@fullcalendar/react',
-        '@fullcalendar/daygrid',
-        '@fullcalendar/timegrid',
+        './fullcalendar/core',
+        './fullcalendar/react',
+        './fullcalendar/daygrid',
+        './fullcalendar/timegrid',
       ],
     },
   },
