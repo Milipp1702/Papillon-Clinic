@@ -16,6 +16,7 @@ import PageTitle from '../../components/baseComponents/PageTitle';
 import { useNavigate, useParams } from 'react-router-dom';
 import { SCREEN_PATHS } from '../../constants/paths';
 import * as S from './styles';
+import InputError from '../../components/baseComponents/InputError';
 
 type FormData = {
   name: string;
@@ -39,7 +40,7 @@ export type Guardian = {
 
 const formErrors: dataFormat = {
   name: {
-    required: 'Informe o nome do responsável!',
+    required: 'Informe o nome do paciente!',
   },
   street: {
     required: 'Informe a rua!',
@@ -48,20 +49,21 @@ const formErrors: dataFormat = {
     required: 'Informe o CPF!',
   },
   birthdate: {
-    required: 'Informe a data de nascimento',
+    required: 'Informe a data de nascimento!',
   },
   number: {
-    required: 'Informe o número',
+    required: 'Informe o número!',
+    typeError: 'O número deve ser válido!',
+    min: 'O número deve ser maior que zero!',
   },
   neighborhood: {
-    required: 'Informe o bairro',
+    required: 'Informe o bairro!',
   },
 };
 
 const RegisterPatient: React.FC = () => {
   const [openModal, setOpenModal] = useState(false);
-  const [error, setError] = useState(false);
-  const [errorMessage, setErrorMessage] = useState('');
+  const [error, setError] = useState('');
   const [guardianList, setGuardianList] = useState<Guardian[] | []>([]);
   const [editGuardian, setEditGuardian] = useState<Guardian | null>(null);
   const [patient, setPatient] = useState<FormData | null>(null);
@@ -69,7 +71,10 @@ const RegisterPatient: React.FC = () => {
   const { registerPatient, findPatientById, updatePatient } = useClinicApi();
   const navigate = useNavigate();
 
-  const handleModal = () => {
+  const handleModal = (isEdit?: boolean) => {
+    if (!isEdit) {
+      setEditGuardian(null);
+    }
     setOpenModal(!openModal);
   };
 
@@ -95,8 +100,11 @@ const RegisterPatient: React.FC = () => {
   });
 
   const onSubmit = async (data: any) => {
-    if (guardianList.length === 0) return;
-
+    if (guardianList.length === 0) {
+      setError('Adicione ao menos um responsável!');
+      return;
+    }
+    setError('');
     const patient = patientMapper({ ...data, guardians: guardianList });
 
     if (id) {
@@ -105,6 +113,7 @@ const RegisterPatient: React.FC = () => {
         return navigate(SCREEN_PATHS.patients);
       } catch (error) {
         console.log(error);
+        setError('Erro ao atualizar paciente.');
       }
     } else {
       try {
@@ -113,13 +122,9 @@ const RegisterPatient: React.FC = () => {
         setGuardianList([]);
       } catch (error) {
         console.log(error);
+        setError('Erro ao cadastrar paciente.');
       }
     }
-  };
-
-  const clearMessages = () => {
-    setError(false);
-    setErrorMessage('');
   };
 
   const handleGuardianAdd = (data: FormGuardianData) => {
@@ -138,7 +143,7 @@ const RegisterPatient: React.FC = () => {
       guardianList.find((guardian) => guardian.cpf === cpf) || null;
 
     setEditGuardian(guardian);
-    handleModal();
+    handleModal(true);
   };
 
   const onEditGuardian = (data: FormGuardianData) => {
@@ -163,9 +168,10 @@ const RegisterPatient: React.FC = () => {
       const response = await findPatientById(id);
       setGuardianList(response.listGuardian);
       setPatient(patientToFormData(response));
+      setError('');
     } catch (error) {
       console.log('error' + error);
-      setError(true);
+      setError('Erro ao buscar dados do paciente.');
     }
   };
 
@@ -187,35 +193,41 @@ const RegisterPatient: React.FC = () => {
             <S.InputWrapper>
               <S.InputContainer>
                 <label htmlFor="name">Nome</label>
-                <Input
-                  id="name"
-                  {...register('name', { onChange: () => clearMessages() })}
-                />
+                <Input id="name" {...register('name')} />
+                {errors.name?.type && (
+                  <InputError>
+                    {formErrors['name'][errors.name?.type]}
+                  </InputError>
+                )}
               </S.InputContainer>
               <S.InputContainer>
                 <label htmlFor="street">Rua</label>
-                <Input
-                  id="street"
-                  {...register('street', { onChange: () => clearMessages() })}
-                />
+                <Input id="street" {...register('street')} />
+                {errors.street?.type && (
+                  <InputError>
+                    {formErrors['street'][errors.street?.type]}
+                  </InputError>
+                )}
               </S.InputContainer>
               <S.InputContainer>
                 <label htmlFor="city">Cidade</label>
-                <Input
-                  id="city"
-                  {...register('city', { onChange: () => clearMessages() })}
-                />
+                <Input id="city" {...register('city')} />
+                {errors.city?.type && (
+                  <InputError>
+                    {formErrors['city'][errors.city?.type]}
+                  </InputError>
+                )}
               </S.InputContainer>
             </S.InputWrapper>
             <S.InputWrapper>
               <S.InputContainer>
                 <label htmlFor="birthdate">Data de Nascimento</label>
-                <Input
-                  id="birthdate"
-                  {...register('birthdate', {
-                    onChange: () => clearMessages(),
-                  })}
-                />
+                <Input id="birthdate" {...register('birthdate')} />
+                {errors.birthdate?.type && (
+                  <InputError>
+                    {formErrors['birthdate'][errors.birthdate?.type]}
+                  </InputError>
+                )}
               </S.InputContainer>
               <div style={{ display: 'flex', gap: '40px' }}>
                 <S.InputContainer className="number">
@@ -224,17 +236,22 @@ const RegisterPatient: React.FC = () => {
                     type="number"
                     min={1}
                     id="number"
-                    {...register('number', { onChange: () => clearMessages() })}
+                    {...register('number')}
                   />
+                  {errors.number?.type && (
+                    <InputError>
+                      {formErrors['number'][errors.number?.type]}
+                    </InputError>
+                  )}
                 </S.InputContainer>
                 <S.InputContainer className="neighborhood">
                   <label htmlFor="neighborhood">Bairro</label>
-                  <Input
-                    id="neighborhood"
-                    {...register('neighborhood', {
-                      onChange: () => clearMessages(),
-                    })}
-                  />
+                  <Input id="neighborhood" {...register('neighborhood')} />
+                  {errors.neighborhood?.type && (
+                    <InputError>
+                      {formErrors['neighborhood'][errors.neighborhood?.type]}
+                    </InputError>
+                  )}
                 </S.InputContainer>
               </div>
               <S.InputContainer className="complement">
@@ -242,9 +259,7 @@ const RegisterPatient: React.FC = () => {
                 <Input
                   defaultValue={''}
                   id="complement"
-                  {...register('complement', {
-                    onChange: () => clearMessages(),
-                  })}
+                  {...register('complement')}
                 />
               </S.InputContainer>
             </S.InputWrapper>
@@ -252,12 +267,7 @@ const RegisterPatient: React.FC = () => {
           <S.TextareaContainer>
             <div>
               <label htmlFor="observation">Observação</label>
-              <textarea
-                id="observation"
-                {...register('observation', {
-                  onChange: () => clearMessages(),
-                })}
-              />
+              <textarea id="observation" {...register('observation')} />
             </div>
           </S.TextareaContainer>
           <S.GuardianFieldset>
@@ -267,7 +277,7 @@ const RegisterPatient: React.FC = () => {
                 variant="iconButton"
                 type="button"
                 aria-label="Adicionar Responsável "
-                onClick={handleModal}
+                onClick={() => handleModal(false)}
               >
                 <Icon icon="addButton" size={32} />
               </Button>
@@ -288,6 +298,7 @@ const RegisterPatient: React.FC = () => {
             onAdd={handleGuardianAdd}
             onEdit={onEditGuardian}
           />
+          {error && <S.ErrorMessage>{error}</S.ErrorMessage>}
         </S.Form>
       </S.Main>
     </PageWrapper>

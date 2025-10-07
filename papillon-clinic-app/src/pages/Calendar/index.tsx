@@ -29,11 +29,7 @@ export interface EventType {
   };
 }
 
-interface CalendarProps {
-  sidebarOpen: boolean;
-}
-
-const Calendar: React.FC<CalendarProps> = () => {
+const Calendar: React.FC = () => {
   const {
     getAppointmentsForCalendar,
     getAllProfessionals,

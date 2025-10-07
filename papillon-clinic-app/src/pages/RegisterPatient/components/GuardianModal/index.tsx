@@ -10,6 +10,7 @@ import { yupResolver } from '@hookform/resolvers/yup';
 import { dataFormat } from '../../../../constants/types';
 import InputError from '../../../../components/baseComponents/InputError';
 import * as S from './styles';
+import { useEffect } from 'react';
 
 type Props = {
   isOpen: boolean;
@@ -82,6 +83,12 @@ const GuardianModal: React.FC<Props> = ({
     resolver: yupResolver(guardianSchema),
     values: { ...guardian } as FormGuardianData,
   });
+
+  useEffect(() => {
+    if (guardian === null) {
+      reset();
+    }
+  }, []);
 
   const onSubmit = (data: FormGuardianData) => {
     if (guardian) {
@@ -186,7 +193,7 @@ const GuardianModal: React.FC<Props> = ({
           variant="primary"
           onClick={handleSubmit(onSubmit)}
         >
-          Adicionar
+          {guardian ? 'Salvar' : 'Adicionar'}
         </Button>
       </S.Form>
     </Modal>

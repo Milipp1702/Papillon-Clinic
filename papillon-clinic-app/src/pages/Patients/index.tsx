@@ -62,11 +62,13 @@ const Patients: React.FC = () => {
           </span>
         )}
         {patientList && (
-          <TableList
-            columns={columns}
-            rows={patientList}
-            redirect={SCREEN_PATHS.patients}
-          />
+          <S.TableContainer>
+            <TableList
+              columns={columns}
+              rows={patientList}
+              redirect={SCREEN_PATHS.patients}
+            />
+          </S.TableContainer>
         )}
       </S.main>
     </PageWrapper>

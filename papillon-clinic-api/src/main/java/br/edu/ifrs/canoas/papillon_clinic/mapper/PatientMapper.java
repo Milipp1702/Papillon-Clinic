@@ -12,6 +12,7 @@ import br.edu.ifrs.canoas.papillon_clinic.domain.patient.PatientResponseDTO;
 
 import java.time.LocalDate;
 import java.time.Period;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -19,11 +20,14 @@ import java.util.stream.Collectors;
 public class PatientMapper {
     public static Patient fromDtoToEntity(PatientRegisterDTO patientDto){
         Address address = AddressMapper.fromDtoToEntity(patientDto.address());
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+
+        LocalDate birthdate = LocalDate.parse(patientDto.birthdate(), formatter);
 
         Patient patient = new Patient();
         patient.setName(patientDto.name());
-        patient.setBirthdate(patientDto.birthdate());
-        patient.setAge(Period.between(patientDto.birthdate(), LocalDate.now()).getYears());
+        patient.setBirthdate(birthdate);
+        patient.setAge(Period.between(birthdate, LocalDate.now()).getYears());
         patient.setAddress(address);
         patient.setGuardians(patientDto.listGuardian().stream().map(GuardianMapper::fromDtoToEntity).collect(Collectors.toList()));
         patient.setObservation(patientDto.observation());
