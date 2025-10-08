@@ -69,7 +69,8 @@ interface IRoutes {
 
 export const useClinicApi = () => {
   const { user } = useContext(AuthContext);
-  const userLocalStorage = JSON.parse(localStorage.getItem('user') || '');
+  const raw = localStorage.getItem('user');
+  const userLocalStorage = raw ? JSON.parse(raw) : null;
   const userToken = user?.token || '';
 
   const httpInstance = useHttp(import.meta.env.VITE_API_URL, {
