@@ -1,5 +1,7 @@
 export const SCREEN_PATHS = {
   login: '/',
+  forgotPassword: '/forgot-password',
+  resetPassword: '/reset-password',
   home: '/home',
   patient: '/patients/:id',
   patients: '/patients',

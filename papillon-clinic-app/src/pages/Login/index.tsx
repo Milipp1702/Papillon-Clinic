@@ -4,7 +4,7 @@ import Input from '../../components/baseComponents/Input';
 import papillon_icon from '../../assets/papillon_icon.png';
 import trail from '../../assets/trail.png';
 import { AuthContext } from '../../context/AuthContext';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { SCREEN_PATHS } from '../../constants/paths';
 import { object, string } from 'yup';
 import { yupResolver } from '@hookform/resolvers/yup';
@@ -108,6 +108,7 @@ const Login: React.FC = () => {
             </S.InputContainer>
             {error && <InputError>{errorMessage}</InputError>}
             <Button type="submit">Enviar</Button>
+            <Link to="/forgot-password">Esqueceu sua senha?</Link>
           </S.Form>
         </S.FormContainer>
         <img src={trail} alt="" className="trailTop" aria-hidden />

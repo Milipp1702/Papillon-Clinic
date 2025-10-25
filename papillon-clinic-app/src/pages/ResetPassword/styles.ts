@@ -43,6 +43,10 @@ export const Container = styled.main`
     bottom: -63px;
     left: 0;
   }
+
+  #spinner {
+    margin-right: 8px;
+  }
 `;
 
 export const Form = styled.form`
@@ -61,10 +65,6 @@ export const FormContainer = styled.div`
   border-radius: 13px;
   width: 100%;
   padding: 40px 0 60px 0;
-
-  a {
-    color: black;
-  }
 `;
 
 export const InputContainer = styled.div`
@@ -72,4 +72,13 @@ export const InputContainer = styled.div`
   label {
     font-weight: bold;
   }
+`;
+
+export const SuccessMessage = styled.span`
+  display: inline-block;
+  color: ${({ theme }) => theme.colors.success};
+  font-size: ${({ theme }) => theme.sizes.medium};
+  text-align: center;
+  margin-top: 40px;
+  width: 100%;
 `;

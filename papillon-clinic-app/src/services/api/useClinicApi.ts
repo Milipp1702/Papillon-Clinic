@@ -22,6 +22,8 @@ export type AuthData = {
 
 interface IRoutes {
   auth: (authData: AuthData) => Promise<User>;
+  requestPasswordReset: (email: string) => Promise<void>;
+  resetPassword: (token: string, newPassword: string) => Promise<void>;
   registerPatient: (patient: PatientDTO) => Promise<PatientDTO>;
   updatePatient: (patient: PatientDTO) => Promise<PatientDTO>;
   registerProfessional: (
@@ -88,6 +90,19 @@ export const useClinicApi = () => {
     return await httpInstance.post<User>('/auth', {
       login,
       password,
+    });
+  }
+
+  async function requestPasswordReset(email: string) {
+    return await httpInstance.post('/password-reset/requestPasswordReset', {
+      email,
+    });
+  }
+
+  async function resetPassword(token: string, newPassword: string) {
+    return await httpInstance.post('/password-reset/resetPassword', {
+      token,
+      newPassword,
     });
   }
 
@@ -242,6 +257,8 @@ export const useClinicApi = () => {
     () =>
       <IRoutes>{
         auth,
+        requestPasswordReset,
+        resetPassword,
         registerPatient,
         registerProfessional,
         registerAppointment,

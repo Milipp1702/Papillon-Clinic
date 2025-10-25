@@ -11,11 +11,15 @@ import Patients from '../pages/Patients';
 import Professionals from '../pages/Professionals';
 import Appointments from '../pages/Appointments';
 import Calendar from '../pages/Calendar';
+import ForgotPassword from '../pages/ForgotPassword';
+import ResetPassword from '../pages/ResetPassword';
 
 const Routes: React.FC = () => {
   return (
     <Switch>
       <Route path={SCREEN_PATHS.login} element={<Login />} />
+      <Route path={SCREEN_PATHS.forgotPassword} element={<ForgotPassword />} />
+      <Route path={SCREEN_PATHS.resetPassword} element={<ResetPassword />} />
       <Route element={<PrivateRoutes />}>
         {/* ADD PRIVATE ROUTES HERE */}
         <Route path={SCREEN_PATHS.home} element={<Home />} />
