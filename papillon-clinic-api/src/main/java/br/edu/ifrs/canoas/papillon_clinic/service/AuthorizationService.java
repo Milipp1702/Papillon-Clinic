@@ -19,11 +19,12 @@ public class AuthorizationService implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        return repository.findByLogin(username);
+        return repository.findByLogin(username)
+                .orElseThrow(() -> new UsernameNotFoundException("Usuário não encontrado: " + username));
     }
 
     public User registerUser(String login) throws Exception {
-        Optional<User> oldUser = repository.findUserByLogin(login);
+        Optional<User> oldUser = repository.findByLogin(login);
         if (oldUser.isPresent()) {
             throw new Exception("Usuário com esse CPF já existe");
         }

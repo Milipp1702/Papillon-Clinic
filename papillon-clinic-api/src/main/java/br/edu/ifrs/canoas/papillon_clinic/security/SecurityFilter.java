@@ -1,5 +1,6 @@
 package br.edu.ifrs.canoas.papillon_clinic.security;
 
+import br.edu.ifrs.canoas.papillon_clinic.domain.user.User;
 import br.edu.ifrs.canoas.papillon_clinic.repository.UserRepository;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -13,6 +14,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
+import java.util.Optional;
 
 @Component
 public class SecurityFilter extends OncePerRequestFilter {
@@ -34,12 +36,11 @@ public class SecurityFilter extends OncePerRequestFilter {
         if(token != null) {
             var login = tokenService.validateToken(token);
 
-            UserDetails user = userRepository.findByLogin(login);
+            Optional<User> optionalUser = userRepository.findByLogin(login);
 
-            if (user != null) {
-                var authentication =
-                        new UsernamePasswordAuthenticationToken(user, null, user.getAuthorities());
-
+            if (optionalUser.isPresent()) {
+                UserDetails user = optionalUser.get();
+                var authentication = new UsernamePasswordAuthenticationToken(user, null, user.getAuthorities());
                 SecurityContextHolder.getContext().setAuthentication(authentication);
             }
         }
