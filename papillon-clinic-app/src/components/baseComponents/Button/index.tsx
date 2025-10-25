@@ -14,7 +14,7 @@ const Button: React.FC<ButtonProps> = ({
   children,
   onClick,
   variant = 'primary',
-  isDisabled = false,
+  isDisabled,
   height,
   width,
   ...props

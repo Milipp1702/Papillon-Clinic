@@ -47,6 +47,10 @@ public class User implements UserDetails {
         else return List.of(new SimpleGrantedAuthority("ROLE_USER"));
     }
 
+    public void updatePassword(String newPassword) {
+        this.password = newPassword;
+    }
+
     @Override
     public String getUsername() {
         return this.login;

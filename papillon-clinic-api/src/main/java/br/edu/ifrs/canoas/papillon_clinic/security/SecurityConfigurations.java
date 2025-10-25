@@ -35,6 +35,8 @@ public class SecurityConfigurations {
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(authorize -> authorize
                         .requestMatchers(HttpMethod.POST, "/auth").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/password-reset/requestPasswordReset").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/password-reset/resetPassword").permitAll()
                         .requestMatchers(HttpMethod.POST, "/professional").hasRole("ADMIN")
                         .anyRequest().authenticated()
                 )

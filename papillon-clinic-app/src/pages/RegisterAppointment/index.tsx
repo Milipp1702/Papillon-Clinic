@@ -216,6 +216,7 @@ const RegisterAppointment: React.FC = () => {
           id,
         });
         if (skippedDateTimes.length === 0) {
+          console.log(SCREEN_PATHS.appointments);
           navigate(SCREEN_PATHS.appointments);
         } else {
           callErrorDates(skippedDateTimes);
