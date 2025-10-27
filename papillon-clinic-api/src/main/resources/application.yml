@@ -17,21 +17,17 @@ spring:
     url: ${DB_URL}
     driver-class-name: com.mysql.cj.jdbc.Driver
   mail:
-    host: smtp.gmail.com
-    port: 465
-    username: ${EMAIL_USERNAME}
-    password: ${EMAIL_PASSWORD}
+    host: smtp.resend.com
+    port: 587
+    username: re_WqQrz3dz_8NpAhmGTWDvzbTw7koMTQRYi
+    password: re_WqQrz3dz_8NpAhmGTWDvzbTw7koMTQRYi
     protocol: smtp
     properties:
       mail:
         smtp:
           auth: true
-          ssl:
+          starttls:
             enable: true
-          socketFactory:
-            port: 465
-            class: javax.net.ssl.SSLSocketFactory
-            fallback: false
 app:
   url: ${APP_URL}
 api:

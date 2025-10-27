@@ -14,9 +14,6 @@ public class EmailService {
     @Autowired
     private JavaMailSender mailSender;
 
-    @Value("${spring.mail.username}")
-    private String fromEmail;
-
     @Value("${app.url}")
     private String appUrl;
 
@@ -28,7 +25,8 @@ public class EmailService {
 
             helper.setTo(destinatario);
             helper.setSubject("Redefinição de Senha – Clínica Papillon");
-            helper.setFrom(fromEmail);
+            helper.setFrom("papillon@resend.dev");
+
 
             String htmlContent = "<p>Olá,</p>" +
                     "<p>Recebemos uma solicitação para redefinir sua senha.</p>" +
