@@ -8,6 +8,7 @@ import br.edu.ifrs.canoas.papillon_clinic.service.ProfessionalWorkdayService;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
@@ -39,6 +40,13 @@ public class ProfessionalController {
     @Transactional
     public void update(@RequestBody ProfessionalDTO professionalDto) throws Exception {
         service.updateProfessional(professionalDto);
+    }
+
+    @DeleteMapping("/{id}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    @Transactional
+    public void deleteProfessional(@PathVariable("id") String id) throws Exception {
+        service.softDeleteProfessional(id);
     }
 
     @GetMapping("/{id}")
@@ -89,6 +97,16 @@ public class ProfessionalController {
 
         List<AvailableSlot> slots = professionalWorkdayService.getAllAvailableSlots(parsedDate, specialty, ids);
         return ResponseEntity.ok(slots);
+    }
+
+    @GetMapping("/search")
+    public Page<ProfessionalResponseDTO> search(
+            @RequestParam(defaultValue = "") String query,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
+
+        Pageable pageable = PageRequest.of(page, size);
+        return service.search(query, pageable);
     }
 
     @GetMapping("getIdByUser")

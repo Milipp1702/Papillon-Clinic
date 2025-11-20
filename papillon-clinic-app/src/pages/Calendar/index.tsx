@@ -45,6 +45,7 @@ const Calendar: React.FC = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const navigate = useNavigate();
   const { user } = useContext(AuthContext);
+  const [loading, setLoading] = useState(false);
 
   const handleEdit = () => {
     if (selectedEvent) {
@@ -65,12 +66,15 @@ const Calendar: React.FC = () => {
   };
 
   const getAppointments = async (ids?: String[]) => {
+    setLoading(true);
     try {
       const query = ids && ids.length > 0 ? ids : [];
       const response = await getAppointmentsForCalendar(query);
+      setLoading(false);
       setAppointments(response);
     } catch (error) {
       console.error('Erro ao buscar atendimentos:', error);
+      setLoading(false);
     }
   };
 
@@ -132,6 +136,7 @@ const Calendar: React.FC = () => {
               selectedIds={selectedIds}
               toggleProfessional={toggleProfessional}
               getAppointments={getAppointments}
+              loading={loading}
             />
             <Link
               to={SCREEN_PATHS.registerAppointment}

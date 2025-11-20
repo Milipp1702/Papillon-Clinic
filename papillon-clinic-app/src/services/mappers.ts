@@ -2,6 +2,7 @@ import { AppointmentDTO, PatientDTO, ProfessionalDTO } from './dtos';
 
 type PatientForm = {
   name: string;
+  cpf: string;
   birthdate: string;
   street: string;
   number: number;
@@ -21,6 +22,7 @@ type PatientForm = {
 
 type PatientFormData = {
   name: string;
+  cpf: string;
   birthdate: string;
   street: string;
   number: number;
@@ -34,7 +36,7 @@ type ProfessionalFormData = {
   name: string;
   cpf: string;
   email: string;
-  crm: string;
+  registerNumber: string;
   phone_number: string;
   specialty_id: string;
   discount: number;
@@ -66,6 +68,7 @@ type AppointmentFormData = {
 export const patientMapper = (data: PatientForm): PatientDTO => {
   return {
     name: data.name,
+    cpf: data.cpf,
     address: {
       street: data.street,
       number: data.number,
@@ -82,6 +85,7 @@ export const patientMapper = (data: PatientForm): PatientDTO => {
 export const patientToFormData = (data: PatientDTO): PatientFormData => {
   return {
     name: data.name,
+    cpf: data.cpf,
     street: data.address.street,
     number: data.address.number,
     city: data.address.city,
@@ -99,7 +103,7 @@ export const professionalToFormData = (
     name: data.name,
     cpf: data.cpf,
     email: data.email,
-    crm: data.crm,
+    registerNumber: data.registerNumber,
     phone_number: data.phone_number,
     specialty_id: data.specialty_id,
     discount: data.discount,

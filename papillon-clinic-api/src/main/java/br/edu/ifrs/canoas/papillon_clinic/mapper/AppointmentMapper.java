@@ -7,6 +7,8 @@ import br.edu.ifrs.canoas.papillon_clinic.domain.professional.Professional;
 import br.edu.ifrs.canoas.papillon_clinic.domain.professional.ProfessionalDTO;
 import br.edu.ifrs.canoas.papillon_clinic.domain.professional.ProfessionalWorkdayDTO;
 
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.List;
 
 public class AppointmentMapper {
@@ -18,7 +20,7 @@ public class AppointmentMapper {
         appointment.setPatient(patient);
         appointment.setProfessional(professional);
         appointment.setObservation(dto.observation());
-        appointment.setPayment_date(dto.payment_date());
+        appointment.setPaymentDate(dto.paymentDate());
         appointment.setPayment_type(dto.payment_type());
         appointment.assignFrequency(frequency);
         return appointment;
@@ -37,7 +39,7 @@ public class AppointmentMapper {
 
     public static AppointmentDTO fromEntityToDto(Appointment appointment){
         AppointmentFrequencyDTO appointmentFrequencyDTO = AppointmentFrequencyMapper.fromEntityToDto(appointment.getFrequency());
-        return new AppointmentDTO(appointment.getId(), appointment.getAppointmentDate(), appointment.getPayment_type(), appointment.getPayment_date(), appointment.getObservation(), appointment.getProfessional().getId(), appointment.getPatient().getId(),appointment.getAppointmentTypes().getId(), appointmentFrequencyDTO);
+        return new AppointmentDTO(appointment.getId(), appointment.getAppointmentDate(), appointment.getPayment_type(), appointment.getPaymentDate(), appointment.getObservation(), appointment.getProfessional().getId(), appointment.getPatient().getId(),appointment.getAppointmentTypes().getId(), appointmentFrequencyDTO);
     }
 
     public static AppointmentDetailsDTO fromEntityToDtoDetailed(Appointment appointment, String specialtyId, String professionalName){
@@ -51,7 +53,7 @@ public class AppointmentMapper {
                 appointment.getId(),
                 appointment.getAppointmentDate(),
                 appointment.getPayment_type(),
-                appointment.getPayment_date(),
+                appointment.getPaymentDate(),
                 appointment.getObservation(),
                 appointment.getProfessional().getId(),
                 appointment.getPatient().getId(),

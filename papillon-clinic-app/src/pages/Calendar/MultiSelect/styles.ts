@@ -8,7 +8,8 @@ export const MultiSelectContainer = styled.div`
   width: 400px;
 
   .button-search {
-    width: 100px;
+    width: auto;
+    padding: 0 15px;
     font-size: 2.2rem;
     min-height: 40px;
   }

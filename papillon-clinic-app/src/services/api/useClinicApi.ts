@@ -13,6 +13,7 @@ import {
   SpecialtyListDTO,
   AvailableSlotsDTO,
   WorkdayWithShiftsDTO,
+  AppointmentFinancialDTO,
 } from '../dtos';
 
 export type AuthData = {
@@ -35,11 +36,17 @@ interface IRoutes {
   ) => Promise<ProfessionalDTO>;
   updateAppointment: (appointment: AppointmentDTO) => Promise<String[]>;
   getPatients: (page?: number, size?: number) => Promise<Page<PatientListDTO>>;
+  getAllPatients: () => Promise<PatientListDTO[]>;
   getProfessionals: (
     page?: number,
     size?: number
   ) => Promise<Page<ProfessionalListDTO>>;
   getAppointments: (
+    page?: number,
+    size?: number
+  ) => Promise<Page<AppointmentListDTO>>;
+  getAppointmentsForProfessional: (
+    userId: String,
     page?: number,
     size?: number
   ) => Promise<Page<AppointmentListDTO>>;
@@ -61,12 +68,32 @@ interface IRoutes {
   getAppointmentsForCalendar: (
     professionalIds?: String[]
   ) => Promise<AppointmentListDTO[]>;
+  getListAppointmentsFinancial: (
+    patientId?: String,
+    professionalId?: String
+  ) => Promise<AppointmentFinancialDTO[]>;
   getAllProfessionals: () => Promise<ProfessionalListDTO[]>;
+  searchProfessionals: (
+    query: string,
+    page?: number,
+    size?: number
+  ) => Promise<Page<ProfessionalListDTO>>;
+  searchAppointments: (
+    query: string,
+    page?: number,
+    size?: number
+  ) => Promise<Page<AppointmentListDTO>>;
   getProfessionalIdByUser: (userId: String) => Promise<String>;
   findPatientById: (id: string) => Promise<PatientDTO>;
   findProfessionalById: (id: string) => Promise<ProfessionalDTO>;
   findAppointmentById: (id: string) => Promise<AppointmentDTO>;
   verifyToken: () => Promise<string>;
+  deletePatient: (id: string) => Promise<void>;
+  deleteProfessional: (id: string) => Promise<void>;
+  deleteAppointment: (
+    id: string,
+    deleteFrequencyAppointments: boolean
+  ) => Promise<void>;
 }
 
 export const useClinicApi = () => {
@@ -138,9 +165,50 @@ export const useClinicApi = () => {
     );
   }
 
+  async function deletePatient(id: string) {
+    return await httpInstance.del(`/patient/${id}`);
+  }
+
+  async function deleteProfessional(id: string) {
+    return await httpInstance.del(`/professional/${id}`);
+  }
+
+  async function deleteAppointment(
+    id: string,
+    deleteFrequencyAppointments: boolean
+  ) {
+    return await httpInstance.del(
+      `/appointment/${id}?deleteFrequencyAppointments=${deleteFrequencyAppointments}`
+    );
+  }
+
+  async function getAllPatients() {
+    return await httpInstance.get<PatientListDTO[]>(`/patient/getAllPatients`);
+  }
+
   async function getProfessionals(page: number = 0, size: number = 10) {
     return await httpInstance.get<Page<ProfessionalListDTO>>(
       `/professional?page=${page}&size=${size}`
+    );
+  }
+
+  async function searchProfessionals(
+    query: string,
+    page: number = 0,
+    size: number = 10
+  ) {
+    return await httpInstance.get<Page<ProfessionalListDTO>>(
+      `/professional/search?query=${query}&page=${page}&size=${size}`
+    );
+  }
+
+  async function searchAppointments(
+    query: string,
+    page: number = 0,
+    size: number = 10
+  ) {
+    return await httpInstance.get<Page<AppointmentListDTO>>(
+      `/appointment/search?query=${query}&page=${page}&size=${size}`
     );
   }
 
@@ -162,8 +230,34 @@ export const useClinicApi = () => {
     );
   }
 
+  async function getAppointmentsForProfessional(
+    userId: String,
+    page: number = 0,
+    size: number = 10
+  ) {
+    return await httpInstance.get<Page<AppointmentListDTO>>(
+      `/appointment/getListAppointments/${userId}?page=${page}&size=${size}`
+    );
+  }
+
   async function getAppointmentTypes() {
     return await httpInstance.get<AppointmentTypeListDTO[]>(`/appointmentType`);
+  }
+
+  async function getListAppointmentsFinancial(
+    patientId?: String,
+    professionalId?: String
+  ) {
+    let queryParams = ``;
+
+    if (patientId) {
+      queryParams = `patientId=${patientId}`;
+    } else {
+      queryParams = `professionalId=${professionalId}`;
+    }
+
+    const url = `/appointment/getListAppointmentsFinancial?${queryParams}`;
+    return await httpInstance.get<AppointmentFinancialDTO[]>(url);
   }
 
   async function getSpecialties() {
@@ -262,11 +356,18 @@ export const useClinicApi = () => {
         registerPatient,
         registerProfessional,
         registerAppointment,
+        searchProfessionals,
+        searchAppointments,
         getPatients,
         getProfessionals,
         getProfessionalsBySpecialty,
         getAppointments,
+        deletePatient,
+        deleteProfessional,
+        deleteAppointment,
+        getAppointmentsForProfessional,
         getAppointmentTypes,
+        getListAppointmentsFinancial,
         getSpecialties,
         getTopSixProfessionals,
         getNumberOfProfessionals,
@@ -275,6 +376,7 @@ export const useClinicApi = () => {
         getAllAvailableSlots,
         getAllWorkdaysWithShifts,
         getProfessionalIdByUser,
+        getAllPatients,
         getAppointmentsForCalendar,
         getAllProfessionals,
         findPatientById,

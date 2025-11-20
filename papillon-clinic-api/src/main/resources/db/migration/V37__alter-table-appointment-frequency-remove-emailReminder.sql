@@ -1,0 +1,1 @@
+ALTER TABLE appointment_frequency DROP COLUMN email_reminder;

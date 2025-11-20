@@ -37,11 +37,10 @@ public class ProfessionalWorkdayService {
 
     private List<LocalDate> findNextDatesForDay(String dayName, LocalDate today) {
         DayOfWeek targetDay = mapDayNameToDayOfWeek(dayName);
-        LocalDate firstDay = today.withDayOfMonth(1);  // Primeiro dia do mês atual
-        LocalDate lastDay = today.plusMonths(1).withDayOfMonth(today.plusMonths(1).lengthOfMonth()); // Último dia do próximo mês
+        LocalDate lastDay = today.plusMonths(2).withDayOfMonth(today.plusMonths(1).lengthOfMonth());
 
         List<LocalDate> availableDates = new ArrayList<>();
-        LocalDate currentDate = firstDay;
+        LocalDate currentDate = today;
 
         while (!currentDate.isAfter(lastDay)) {
             if (currentDate.getDayOfWeek() == targetDay) {

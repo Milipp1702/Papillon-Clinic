@@ -79,8 +79,7 @@ const ForgotPassword: React.FC = () => {
           <Button type="submit" isDisabled={loading}>
             {loading ? (
               <>
-                <Spinner id="spinner" />
-                Enviando...
+                <Spinner id="spinner" /> Enviando...
               </>
             ) : (
               <span>Enviar</span>

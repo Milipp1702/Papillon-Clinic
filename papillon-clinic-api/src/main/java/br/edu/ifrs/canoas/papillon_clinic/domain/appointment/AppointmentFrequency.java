@@ -28,9 +28,6 @@ public class AppointmentFrequency {
     @Column
     private Integer frequency_interval;
 
-    @Column(name = "email_reminder")
-    private boolean emailReminder;
-
     @OneToMany(mappedBy = "frequency", cascade = CascadeType.ALL)
     private List<Appointment> appointments = new ArrayList<>();
 }

@@ -2,12 +2,14 @@ import React, { useState, useRef, useEffect } from 'react';
 import * as S from './styles';
 import { ProfessionalListDTO } from '../../../services/dtos';
 import Button from '../../../components/baseComponents/Button';
+import Spinner from '../../../components/baseComponents/Spinner';
 
 type MultiSelectProps = {
   professionals: ProfessionalListDTO[];
   selectedIds: String[];
   toggleProfessional: (id: String) => void;
   getAppointments: (ids?: String[]) => void;
+  loading?: boolean;
 };
 
 const MultiSelect: React.FC<MultiSelectProps> = ({
@@ -15,6 +17,7 @@ const MultiSelect: React.FC<MultiSelectProps> = ({
   selectedIds,
   toggleProfessional,
   getAppointments,
+  loading,
 }) => {
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
@@ -68,7 +71,13 @@ const MultiSelect: React.FC<MultiSelectProps> = ({
           variant="primary"
           onClick={() => getAppointments(selectedIds)}
         >
-          Buscar
+          {loading ? (
+            <>
+              <Spinner id="spinner" /> Buscando...
+            </>
+          ) : (
+            'Buscar'
+          )}
         </Button>
       </div>
     </S.MultiSelectContainer>

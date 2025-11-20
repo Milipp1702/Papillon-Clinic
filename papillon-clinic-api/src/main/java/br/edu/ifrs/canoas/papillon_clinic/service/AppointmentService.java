@@ -7,15 +7,19 @@ import br.edu.ifrs.canoas.papillon_clinic.mapper.AppointmentFrequencyMapper;
 import br.edu.ifrs.canoas.papillon_clinic.mapper.AppointmentMapper;
 import br.edu.ifrs.canoas.papillon_clinic.repository.AppointmentFrequencyRepository;
 import br.edu.ifrs.canoas.papillon_clinic.repository.AppointmentRepository;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.http.HttpStatus;
+import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
-import org.springframework.web.server.ResponseStatusException;
 
+import java.math.BigDecimal;
+import java.sql.Timestamp;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.time.temporal.ChronoUnit;
 import java.time.temporal.TemporalAdjusters;
 import java.util.ArrayList;
@@ -44,6 +48,10 @@ public class AppointmentService {
 
     @Autowired
     ProfessionalWorkdayService professionalWorkdayService;
+
+    @PersistenceContext
+    private EntityManager entityManager;
+
 
     public Optional<Appointment> getById(String id){
         return repository.findById(id);
@@ -206,8 +214,24 @@ public class AppointmentService {
     private void updateFrequencyFields(AppointmentFrequency freq, AppointmentFrequencyDTO dto) {
         freq.setEnd_date(dto.end_date());
         freq.setFrequency_interval(dto.frequency_interval());
-        freq.setEmailReminder(dto.emailReminder());
         freq.setFrequency(dto.frequency());
+    }
+
+    public void deleteAppointment(String appointmentId, boolean deleteFrequencyAppointments) throws Exception {
+        Appointment appointment = repository.findById(appointmentId)
+                .orElseThrow(() -> new Exception("Appointment not found"));
+
+        AppointmentFrequency frequency = appointment.getFrequency();
+
+        repository.delete(appointment);
+
+        if (deleteFrequencyAppointments && frequency != null) {
+            List<Appointment> futureAppointments = repository
+                    .findByFrequency_IdAndAppointmentDateAfter(frequency.getId(), LocalDateTime.now());
+
+            repository.deleteAll(futureAppointments);
+            appointmentFrequencyRepository.delete(frequency);
+        }
     }
 
     private AppointmentFrequency updateOrCreateFrequency(AppointmentFrequencyDTO dto) {
@@ -247,7 +271,7 @@ public class AppointmentService {
     private void updateAppointmentFields(Appointment existing, AppointmentDTO dto, Professional professional, Patient patient, AppointmentTypes type, AppointmentFrequency frequency) {
         existing.setAppointmentDate(dto.appointment_date());
         existing.setPayment_type(dto.payment_type());
-        existing.setPayment_date(dto.payment_date());
+        existing.setPaymentDate(dto.paymentDate());
         existing.setPatient(patient);
         existing.setProfessional(professional);
         existing.setAppointmentTypes(type);
@@ -261,8 +285,7 @@ public class AppointmentService {
         if (oldFreq == null) return false;
         return !Objects.equals(oldFreq.getEnd_date(), dto.end_date())
                 || !Objects.equals(oldFreq.getFrequency_interval(), dto.frequency_interval())
-                || !Objects.equals(oldFreq.getFrequency(), dto.frequency())
-                || oldFreq.isEmailReminder() != dto.emailReminder();
+                || !Objects.equals(oldFreq.getFrequency(), dto.frequency());
     }
 
     public List<LocalDateTime> updateAppointment(AppointmentDTO dto) throws Exception {
@@ -285,9 +308,6 @@ public class AppointmentService {
 
         boolean frequencyChanged = hasFrequencyChanged(previousFrequency, dto.frequency());
         List<LocalDateTime> skippedDateTimes = List.of();
-        System.out.println((previousFrequency));
-        System.out.println((dto.frequency()));
-        System.out.println("---------------"+updatedFrequency);
         if (frequencyChanged && updatedFrequency != null) {
             skippedDateTimes = regenerateAppointments(updatedFrequency, dto, professional);
         }
@@ -297,7 +317,66 @@ public class AppointmentService {
     }
 
     public Page<AppointmentResponseDTO> getListAppointments(Pageable pagination){
-        return repository.findAll(pagination).map(AppointmentMapper::fromEntityToDtoResponse);
+        Pageable sortedByDate = PageRequest.of(
+                pagination.getPageNumber(),
+                pagination.getPageSize(),
+                Sort.by("appointmentDate").ascending()
+        );
+        return repository.findAll(sortedByDate).map(AppointmentMapper::fromEntityToDtoResponse);
+    }
+
+    public Page<AppointmentResponseDTO> getListAppointmentsForProfessional(Pageable pagination, String userId) {
+        Pageable sortedByDate = PageRequest.of(
+                pagination.getPageNumber(),
+                pagination.getPageSize(),
+                Sort.by("appointmentDate").ascending()
+        );
+        return repository.findByProfessional_UserId(userId, sortedByDate)
+                .map(AppointmentMapper::fromEntityToDtoResponse);
+    }
+
+    public List<AppointmentFinancialDTO> getAppointmentFinancials(String patientId, String professionalId) {
+        List<Object[]> results = entityManager.createNativeQuery("""
+                            SELECT 
+                                a.appointment_date,
+                                p.name,                                             
+                                pr.name,
+                                at.name,
+                                s.name,
+                                at.amount,
+                                CASE WHEN a.payment_date IS NOT NULL THEN true ELSE false END AS isPaid,
+                                pr.discount
+                            FROM appointments a
+                            JOIN patients p ON a.patient_id = p.id
+                            JOIN professionals pr ON a.professional_id = pr.id
+                            JOIN specialties s ON pr.specialty_id = s.id
+                            JOIN appointment_types at ON a.appointment_type = at.id
+                            WHERE (:patientId IS NULL OR a.patient_id = :patientId)
+                              AND (:professionalId IS NULL OR a.professional_id = :professionalId)
+                              AND MONTH(a.appointment_date) = MONTH(CURRENT_DATE)
+                              AND YEAR(a.appointment_date) = YEAR(CURRENT_DATE)
+                        """)
+                .setParameter("patientId", patientId)
+                .setParameter("professionalId", professionalId)
+                .getResultList();
+
+
+        return results.stream()
+                .map(r -> {
+                    BigDecimal amount = (BigDecimal) r[5];
+                    BigDecimal discount = (BigDecimal) r[7];
+                    BigDecimal netAmount = amount.multiply(BigDecimal.ONE.subtract(discount.divide(BigDecimal.valueOf(100))));
+                    return new AppointmentFinancialDTO(
+                        ((Timestamp) r[0]).toLocalDateTime(),
+                        (String) r[1],
+                        (String) r[2],
+                        (String) r[3],
+                        (String) r[4],
+                        (BigDecimal) r[5],
+                        (Long) r[6],
+                            netAmount
+                );})
+                .toList();
     }
 
     public List<AppointmentResponseDTO> getAppointmentsForCalendar(List<String> professionalIds) {
@@ -314,7 +393,43 @@ public class AppointmentService {
                 .collect(Collectors.toList());
     }
 
+    public Page<AppointmentResponseDTO> search(String query, Pageable pageable) {
+        Page<Appointment> result;
+
+        try {
+            System.out.println(query);
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+
+            LocalDate date = LocalDate.parse(query, formatter);
+            LocalDateTime startOfDay = date.atStartOfDay();
+            LocalDateTime endOfDay = date.atTime(LocalTime.MAX);
+
+            List<Appointment> appointments = repository.findByAppointmentDateBetween(startOfDay, endOfDay);
+
+            int start = (int) pageable.getOffset();
+            int end = Math.min((start + pageable.getPageSize()), appointments.size());
+            result = new PageImpl<>(appointments.subList(start, end), pageable, appointments.size());
+        } catch (DateTimeParseException e) {
+            if (query.equalsIgnoreCase("pago")) {
+                result = repository.findByPaymentDateIsNotNull(pageable);
+            } else if (query.equalsIgnoreCase("não pago") || query.equalsIgnoreCase("nao pago")) {
+                result = repository.findByPaymentDateIsNull(pageable);
+            } else {
+                result = repository.findByProfessionalNameContainingIgnoreCaseOrPatientNameContainingIgnoreCaseOrAppointmentTypesNameContainingIgnoreCaseOrProfessionalSpecialtyNameContainingIgnoreCase(
+                        query, query, query, query, pageable);
+            }
+        } return result.map(a -> new AppointmentResponseDTO(
+                a.getId(),
+                a.getProfessional().getName(),
+                a.getPatient().getName(),
+                a.getAppointmentTypes().getName(),
+                a.getAppointmentDate(),
+                a.getPaymentDate() != null,
+                a.getProfessional().getSpecialty().getName()
+        ));
+    }
+
     public long getQuantityAppointments(){
-        return repository.findByAppointmentDateBetween(LocalDate.now().with(TemporalAdjusters.firstDayOfMonth()),LocalDate.now()).size();
+        return repository.findByAppointmentDateBetween(LocalDateTime.now().with(TemporalAdjusters.firstDayOfMonth()),LocalDateTime.now()).size();
     }
 }

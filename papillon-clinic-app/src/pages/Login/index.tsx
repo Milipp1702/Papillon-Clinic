@@ -8,10 +8,11 @@ import { Link, useNavigate } from 'react-router-dom';
 import { SCREEN_PATHS } from '../../constants/paths';
 import { object, string } from 'yup';
 import { yupResolver } from '@hookform/resolvers/yup';
-import { useForm } from 'react-hook-form';
+import { set, useForm } from 'react-hook-form';
 import InputError from '../../components/baseComponents/InputError';
 import * as S from './styles';
 import { dataFormat } from '../../constants/types';
+import Spinner from '../../components/baseComponents/Spinner';
 
 type FormData = {
   login: string;
@@ -31,6 +32,7 @@ const Login: React.FC = () => {
   const [error, setError] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
   const { login, isAuth, user } = useContext(AuthContext);
+  const [loading, setLoading] = useState(false);
 
   const navigate = useNavigate();
 
@@ -48,13 +50,15 @@ const Login: React.FC = () => {
   });
 
   const onSubmit = async (data: any) => {
+    setLoading(true);
     try {
       await login(data);
-
+      setLoading(false);
       return navigate(SCREEN_PATHS.home);
     } catch (error: any) {
       setErrorMessage('Email ou Senha Inválidos!');
       setError(true);
+      setLoading(false);
     }
   };
 
@@ -107,7 +111,15 @@ const Login: React.FC = () => {
               )}
             </S.InputContainer>
             {error && <InputError>{errorMessage}</InputError>}
-            <Button type="submit">Enviar</Button>
+            <Button type="submit" isDisabled={loading}>
+              {loading ? (
+                <>
+                  <Spinner id="spinner" /> Enviando...
+                </>
+              ) : (
+                <span>Enviar</span>
+              )}
+            </Button>
             <Link to="/forgot-password">Esqueceu sua senha?</Link>
           </S.Form>
         </S.FormContainer>

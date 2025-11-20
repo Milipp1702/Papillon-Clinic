@@ -1,11 +1,13 @@
 package br.edu.ifrs.canoas.papillon_clinic.service;
 
+import br.edu.ifrs.canoas.papillon_clinic.domain.appointment.Appointment;
 import br.edu.ifrs.canoas.papillon_clinic.domain.professional.*;
 import br.edu.ifrs.canoas.papillon_clinic.domain.shift.Shift;
 import br.edu.ifrs.canoas.papillon_clinic.domain.user.User;
 import br.edu.ifrs.canoas.papillon_clinic.domain.workday.WorkDay;
 import br.edu.ifrs.canoas.papillon_clinic.mapper.ProfessionalMapper;
 import br.edu.ifrs.canoas.papillon_clinic.mapper.ProfessionalWorkdayMapper;
+import br.edu.ifrs.canoas.papillon_clinic.repository.AppointmentRepository;
 import br.edu.ifrs.canoas.papillon_clinic.repository.ProfessionalRepository;
 import br.edu.ifrs.canoas.papillon_clinic.repository.ProfessionalWorkdayRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,6 +17,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -38,6 +41,9 @@ public class ProfessionalService {
 
     @Autowired
     ProfessionalWorkdayRepository professionalWorkdayRepository;
+
+    @Autowired
+    AppointmentRepository appointmentRepository;
 
     public Optional<Professional> getById(String id){
         return repository.findById(id);
@@ -66,7 +72,7 @@ public class ProfessionalService {
         newProfessional.setCpf(professional.cpf());
         newProfessional.setEmail(professional.email());
         newProfessional.setDiscount(professional.discount());
-        newProfessional.setCrm(professional.crm());
+        newProfessional.setRegisterNumber(professional.registerNumber());
         newProfessional.setSpecialty(specialty.get());
 
         professionalWorkdayRepository.deleteAllByProfessionalId(professional.id());
@@ -85,6 +91,10 @@ public class ProfessionalService {
     }
 
     public void registerProfessional(ProfessionalDTO dto) throws Exception {
+        if (repository.existsByEmail(dto.email())) {
+            throw new Exception("Profissional com este e-mail já está cadastrado!");
+        }
+
         Specialty specialty = specialtyService.getById(dto.specialty_id())
                 .orElseThrow(() -> new Exception("Especialidade não encontrada"));
 
@@ -104,14 +114,42 @@ public class ProfessionalService {
 
         repository.save(professional);
     }
+
     public Page<ProfessionalResponseDTO> getListProfessionals(Pageable pagination){
         return repository.findAll(pagination).map(ProfessionalMapper::fromEntityToDtoResponse);
+    }
+
+    public Page<ProfessionalResponseDTO> search(String query, Pageable pageable) {
+        Page<Professional> result = repository
+                .findByNameContainingIgnoreCaseOrCpfContainingIgnoreCaseOrSpecialtyNameContainingIgnoreCase(
+                        query, query, query, pageable);
+
+        return result.map(p -> new ProfessionalResponseDTO(
+                p.getId(), p.getName(), p.getCpf(), p.getSpecialty().getName()
+        ));
     }
 
     public List<ProfessionalResponseDTO> getAllProfessionals() {
         return repository.findAll().stream()
                 .map(ProfessionalMapper::fromEntityToDtoResponse)
                 .collect(Collectors.toList());
+    }
+
+    public void softDeleteProfessional(String id) throws Exception {
+        Optional<Professional> optionalProfessional = repository.findById(id);
+        if (optionalProfessional.isEmpty() || !optionalProfessional.get().isActive()) {
+            throw new Exception("Profissional não encontrado ou já está inativo!");
+        }
+
+        Professional professional = optionalProfessional.get();
+
+        List<Appointment> futureAppointments = appointmentRepository
+                .findByProfessional_IdAndAppointmentDateAfter(professional.getId(), LocalDateTime.now());
+
+        appointmentRepository.deleteAll(futureAppointments);
+
+        professional.setActive(false);
+        repository.save(professional);
     }
 
     public long getQuantityProfessionals(){
@@ -123,11 +161,11 @@ public class ProfessionalService {
     }
 
     public List<ProfessionalResponseDTO> getProfessionalsBySpecialty(String specialty_id){
-        return repository.findBySpecialtyId(specialty_id).stream().map(ProfessionalMapper::fromEntityToDtoResponse).toList();
+        return repository.findBySpecialtyIdAndActiveTrue(specialty_id).stream().map(ProfessionalMapper::fromEntityToDtoResponse).toList();
     }
 
     public String getIdByUser(String userId) {
-        return repository.findByUserId(userId)
+        return repository.findByUserIdAndActiveTrue(userId)
                 .map(Professional::getId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Profissional não encontrado"));
     }

@@ -36,4 +36,7 @@ public class Guardian {
 
     @Column(name = "phone_number")
     private String phoneNumber;
+
+    @Column()
+    private String observation;
 }

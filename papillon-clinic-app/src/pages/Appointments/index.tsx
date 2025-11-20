@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import PageWrapper from '../../components/PageWrapper';
 import PageTitle from '../../components/baseComponents/PageTitle';
 import { SCREEN_PATHS } from '../../constants/paths';
@@ -9,6 +9,8 @@ import Link from '../../components/baseComponents/Link';
 import TableList from '../../components/TableList';
 import { useClinicApi } from '../../services/api/useClinicApi';
 import * as S from './styles';
+import { AuthContext } from '../../context/AuthContext';
+import ConfirmationModal from '../../components/ConfirmationModal';
 
 const columns = [
   {
@@ -35,12 +37,62 @@ const columns = [
 const Appointments: React.FC = () => {
   const [error, setError] = useState(false);
   const [appointmentsList, setAppointmentsList] = useState<any[] | null>(null);
-  const { getAppointments } = useClinicApi();
+  const {
+    getAppointments,
+    getAppointmentsForProfessional,
+    deleteAppointment,
+    searchAppointments,
+  } = useClinicApi();
+  const [page, setPage] = useState(0);
+  const [totalPages, setTotalPages] = useState(0);
+  const { user } = useContext(AuthContext);
+  const [selectedId, setSelectedId] = useState<string>('');
+  const [showModal, setShowModal] = useState(false);
+  const [searchTerm, setSearchTerm] = useState('');
+
+  const openDeleteModal = (id: string) => {
+    setSelectedId(id);
+    setShowModal(true);
+  };
+
+  const confirmDelete = async (deleteAll: boolean) => {
+    try {
+      await deleteAppointment(selectedId, deleteAll);
+
+      setShowModal(false);
+      await getAppointmentsData();
+    } catch (error) {
+      console.error('Erro ao deletar atendimento:', error);
+    }
+  };
 
   const getAppointmentsData = async () => {
     try {
-      const response = await getAppointments();
+      if (user?.role === 'ADMIN') {
+        const response = await getAppointments(page);
+        setAppointmentsList(response.content);
+        setTotalPages(response.totalPages);
+      } else {
+        const userId = user?.id;
+        if (userId) {
+          getAppointmentsForProfessional(userId, page).then((response) => {
+            setAppointmentsList(response.content);
+            setTotalPages(response.totalPages);
+          });
+        }
+      }
+    } catch (error) {
+      console.log('error' + error);
+      setError(true);
+    }
+  };
+
+  const handleSearch = async () => {
+    try {
+      const response = await searchAppointments(searchTerm, page);
+      console.log(response);
       setAppointmentsList(response.content);
+      setTotalPages(response.totalPages);
     } catch (error) {
       console.log('error' + error);
       setError(true);
@@ -49,41 +101,98 @@ const Appointments: React.FC = () => {
 
   useEffect(() => {
     getAppointmentsData();
-  }, []);
+  }, [page]);
 
   return (
     <PageWrapper>
       <S.main>
         <PageTitle>Atendimentos</PageTitle>
         <S.Options>
-          <Link
-            to={SCREEN_PATHS.registerAppointment}
-            variant="button"
-            variantButton="terciary"
-            className="new-appointment-button"
-          >
-            Novo Atendimento
-          </Link>
+          {user?.role === 'ADMIN' && (
+            <Link
+              to={SCREEN_PATHS.registerAppointment}
+              variant="button"
+              variantButton="terciary"
+              className="new-appointment-button"
+            >
+              Novo Atendimento
+            </Link>
+          )}
           <S.InputContainer>
-            <Input id="search" placeholder="Buscar..." />
-            <Button variant="iconButton" aria-label="Buscar">
+            <Input
+              id="search"
+              placeholder="Buscar..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+            />
+            <Button
+              variant="iconButton"
+              aria-label="Buscar"
+              onClick={handleSearch}
+            >
               <Icon icon="search" size={22} />
             </Button>
           </S.InputContainer>
         </S.Options>
         {error && (
-          <span style={{ color: 'red' }} role="alert">
-            Erro ao listar atendimentos
-          </span>
+          <S.ErrorMessage role="alert">
+            <Icon size={70} icon="error" primaryColor="red" />
+            <p>Erro ao listar atendimentos!</p>
+          </S.ErrorMessage>
         )}
         {appointmentsList && (
-          <S.TableContainer>
-            <TableList
-              columns={columns}
-              rows={appointmentsList}
-              redirect={SCREEN_PATHS.appointments}
-            />
-          </S.TableContainer>
+          <>
+            <S.TableContainer>
+              <TableList
+                columns={columns}
+                rows={appointmentsList}
+                redirect={SCREEN_PATHS.appointments}
+                withoutDeleteButton={user?.role !== 'ADMIN'}
+                onDeleteRequest={openDeleteModal}
+              />
+            </S.TableContainer>
+            {totalPages > 1 && (
+              <S.Pagination>
+                <Button onClick={() => setPage(0)} disabled={page === 0}>
+                  <Icon icon="chevronsLeft" size={40} />
+                </Button>
+                <Button
+                  onClick={() => setPage((prev) => Math.max(prev - 1, 0))}
+                  disabled={page === 0}
+                >
+                  <Icon icon="chevronLeft" size={40} />
+                </Button>
+                <span>
+                  Página {page + 1} de {totalPages}
+                </span>
+                <Button
+                  onClick={() =>
+                    setPage((prev) => Math.min(prev + 1, totalPages - 1))
+                  }
+                  disabled={page + 1 >= totalPages}
+                >
+                  <Icon icon="chevronRight" size={40} />
+                </Button>
+                <Button
+                  onClick={() => setPage(totalPages - 1)}
+                  disabled={page + 1 >= totalPages}
+                >
+                  <Icon icon="chevronsRight" size={40} />
+                </Button>
+              </S.Pagination>
+            )}
+          </>
+        )}
+        {showModal && (
+          <ConfirmationModal
+            title="Confirmar exclusão"
+            onConfirm={() => confirmDelete(false)}
+            message="Deseja deletar somente o atendimento selecionado ou todos os atendimentos da frequência dele?"
+            onCancel={() => setShowModal(false)}
+            isOpen={showModal}
+            isAppointment
+            onConfirmAll={() => confirmDelete(true)}
+          />
         )}
       </S.main>
     </PageWrapper>

@@ -29,8 +29,8 @@ public class Professional {
     @Column
     private String email;
 
-    @Column
-    private String crm;
+    @Column(name = "register_number")
+    private String registerNumber;
 
     @ManyToOne
     @JoinColumn(name = "specialty_id")
@@ -45,6 +45,9 @@ public class Professional {
     @OneToOne
     @JoinColumn(name = "user_id")
     private User user;
+
+    @Column(name = "active")
+    private boolean active = true;
 
     @OneToMany(mappedBy = "professional", cascade = CascadeType.ALL)
     private List<Appointment> listAppointments;

@@ -13,6 +13,7 @@ import Appointments from '../pages/Appointments';
 import Calendar from '../pages/Calendar';
 import ForgotPassword from '../pages/ForgotPassword';
 import ResetPassword from '../pages/ResetPassword';
+import FinancialReport from '../pages/FinancialReport';
 
 const Routes: React.FC = () => {
   return (
@@ -57,6 +58,10 @@ const Routes: React.FC = () => {
           element={<RegisterAppointment />}
         ></Route>
         <Route path={SCREEN_PATHS.calendar} element={<Calendar />}></Route>
+        <Route
+          path={SCREEN_PATHS.financialReport}
+          element={<FinancialReport />}
+        ></Route>
       </Route>
     </Switch>
   );

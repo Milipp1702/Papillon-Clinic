@@ -6,6 +6,15 @@ export const main = styled.main`
   overflow: auto;
   margin: 0 auto;
   max-width: 90%;
+
+  .display-none {
+    display: none;
+  }
+
+  a:not([id='new-patient-button']) {
+    width: 44px !important;
+    padding: 0 18px;
+  }
 `;
 
 export const Options = styled.div`
@@ -38,4 +47,28 @@ export const InputContainer = styled.div`
 export const TableContainer = styled.div`
   max-height: 55vh;
   overflow-y: auto;
+`;
+
+export const Pagination = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  justify-content: center;
+  margin-top: 24px;
+
+  button {
+    width: auto;
+    min-height: auto;
+  }
+`;
+
+export const ErrorMessage = styled.span`
+  color: ${({ theme }) => theme.colors.error};
+  font-size: ${({ theme }) => theme.sizes.medium};
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+  margin: 20px 0;
+  width: 100%;
 `;

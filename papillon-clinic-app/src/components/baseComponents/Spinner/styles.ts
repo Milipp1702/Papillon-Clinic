@@ -13,4 +13,5 @@ export const Spinner = styled.div`
   border-top: 2px solid ${({ theme }) => theme.colors.primary};
   border-radius: 50%;
   animation: ${rotate} 0.6s linear infinite;
+  margin-right: 8px;
 `;

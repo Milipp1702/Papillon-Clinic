@@ -13,6 +13,7 @@ public class GuardianMapper {
         guardian.setRelationship(guardianDto.relationship());
         guardian.setMain(guardianDto.isMain());
         guardian.setPhoneNumber(guardianDto.phoneNumber());
+        guardian.setObservation(guardian.getObservation());
         return guardian;
     }
 
@@ -24,10 +25,11 @@ public class GuardianMapper {
         guardian.setRelationship(guardianDto.relationship());
         guardian.setMain(guardianDto.isMain());
         guardian.setPhoneNumber(guardianDto.phoneNumber());
+        guardian.setObservation(guardian.getObservation());
         return guardian;
     }
     public static GuardianResponseDTO fromEntityToDto(Guardian guardian){
-        return new GuardianResponseDTO(guardian.getId(),guardian.getName(), guardian.getCpf(), guardian.getRelationship(), guardian.isMain(), guardian.getPhoneNumber());
+        return new GuardianResponseDTO(guardian.getId(),guardian.getName(), guardian.getCpf(), guardian.getRelationship(), guardian.isMain(), guardian.getPhoneNumber(), guardian.getObservation());
     }
 
 }

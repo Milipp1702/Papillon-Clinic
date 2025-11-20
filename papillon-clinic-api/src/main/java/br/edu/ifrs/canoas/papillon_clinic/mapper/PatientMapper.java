@@ -20,12 +20,13 @@ import java.util.stream.Collectors;
 public class PatientMapper {
     public static Patient fromDtoToEntity(PatientRegisterDTO patientDto){
         Address address = AddressMapper.fromDtoToEntity(patientDto.address());
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
         LocalDate birthdate = LocalDate.parse(patientDto.birthdate(), formatter);
 
         Patient patient = new Patient();
         patient.setName(patientDto.name());
+        patient.setCpf(patientDto.cpf());
         patient.setBirthdate(birthdate);
         patient.setAge(Period.between(birthdate, LocalDate.now()).getYears());
         patient.setAddress(address);
@@ -39,6 +40,7 @@ public class PatientMapper {
 
         Patient patient = new Patient();
         patient.setName(patientDto.name());
+        patient.setCpf(patientDto.cpf());
         patient.setBirthdate(patientDto.birthdate());
         patient.setAge(Period.between(patientDto.birthdate(), LocalDate.now()).getYears());
         patient.setAddress(address);
@@ -59,7 +61,7 @@ public class PatientMapper {
         AddressDTO address = AddressMapper.fromEntityToDto(patient.getAddress());
 
         List<GuardianResponseDTO> listGuardians = patient.getGuardians().stream().map(GuardianMapper::fromEntityToDto).toList();
-        return new PatientDetailedDTO(patient.getId(), patient.getName(),
+        return new PatientDetailedDTO(patient.getId(), patient.getName(), patient.getCpf(),
                 patient.getBirthdate(), address, listGuardians, patient.getObservation());
     }
 }

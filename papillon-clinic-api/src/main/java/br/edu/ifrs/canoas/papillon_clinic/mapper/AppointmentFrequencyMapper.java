@@ -15,11 +15,10 @@ public class AppointmentFrequencyMapper {
         frequency.setEnd_date(frequencyDTO.end_date());
         frequency.setFrequency(frequencyDTO.frequency());
         frequency.setFrequency_interval(frequencyDTO.frequency_interval());
-        frequency.setEmailReminder(frequencyDTO.emailReminder());
         return frequency;
     }
 
     public static AppointmentFrequencyDTO fromEntityToDto(AppointmentFrequency frequency){
-        return new AppointmentFrequencyDTO(frequency.getId(),frequency.getEnd_date(),frequency.getFrequency(),frequency.getFrequency_interval(), frequency.isEmailReminder());
+        return new AppointmentFrequencyDTO(frequency.getId(),frequency.getEnd_date(),frequency.getFrequency(),frequency.getFrequency_interval());
     }
 }
