@@ -33,9 +33,11 @@ export async function generatePDFPatientDocument(
   // --- dados do paciente/responsável (já fornecidos)
   const patientName = selectedName || patientInformation?.name || '-';
   const patientCpf = patientInformation?.cpf || '-';
-  const mainGuardian = Array.isArray(patientInformation?.listGuardian)
-    ? patientInformation.listGuardian.find((g) => g.isMain)
-    : undefined;
+  const mainGuardian =
+    patientInformation && Array.isArray(patientInformation.listGuardian)
+      ? patientInformation &&
+        patientInformation.listGuardian.find((g) => g.isMain)
+      : undefined;
   const guardianName = mainGuardian?.name || '-';
   const guardianCpf = mainGuardian?.cpf || '-';
 
@@ -279,7 +281,7 @@ export async function generatePDFPatientDocument(
     let textY = top + 16;
     lines.forEach((ln) => {
       const parts = doc.splitTextToSize(ln, w - pad * 2);
-      parts.forEach((p) => {
+      parts.forEach((p: string) => {
         doc.text(p, x + pad, textY);
         textY += 6.8;
       });

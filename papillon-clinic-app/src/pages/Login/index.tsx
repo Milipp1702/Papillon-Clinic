@@ -8,7 +8,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { SCREEN_PATHS } from '../../constants/paths';
 import { object, string } from 'yup';
 import { yupResolver } from '@hookform/resolvers/yup';
-import { set, useForm } from 'react-hook-form';
+import { useForm } from 'react-hook-form';
 import InputError from '../../components/baseComponents/InputError';
 import * as S from './styles';
 import { dataFormat } from '../../constants/types';
