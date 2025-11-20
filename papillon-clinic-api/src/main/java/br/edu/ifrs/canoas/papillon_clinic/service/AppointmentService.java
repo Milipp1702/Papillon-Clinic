@@ -214,8 +214,24 @@ public class AppointmentService {
     private void updateFrequencyFields(AppointmentFrequency freq, AppointmentFrequencyDTO dto) {
         freq.setEnd_date(dto.end_date());
         freq.setFrequency_interval(dto.frequency_interval());
-        freq.setEmailReminder(dto.emailReminder());
         freq.setFrequency(dto.frequency());
+    }
+
+    public void deleteAppointment(String appointmentId, boolean deleteFrequencyAppointments) throws Exception {
+        Appointment appointment = repository.findById(appointmentId)
+                .orElseThrow(() -> new Exception("Appointment not found"));
+
+        AppointmentFrequency frequency = appointment.getFrequency();
+
+        repository.delete(appointment);
+
+        if (deleteFrequencyAppointments && frequency != null) {
+            List<Appointment> futureAppointments = repository
+                    .findByFrequency_IdAndAppointmentDateAfter(frequency.getId(), LocalDateTime.now());
+
+            repository.deleteAll(futureAppointments);
+            appointmentFrequencyRepository.delete(frequency);
+        }
     }
 
     private AppointmentFrequency updateOrCreateFrequency(AppointmentFrequencyDTO dto) {
@@ -255,7 +271,7 @@ public class AppointmentService {
     private void updateAppointmentFields(Appointment existing, AppointmentDTO dto, Professional professional, Patient patient, AppointmentTypes type, AppointmentFrequency frequency) {
         existing.setAppointmentDate(dto.appointment_date());
         existing.setPayment_type(dto.payment_type());
-        existing.setPayment_date(dto.payment_date());
+        existing.setPaymentDate(dto.paymentDate());
         existing.setPatient(patient);
         existing.setProfessional(professional);
         existing.setAppointmentTypes(type);
@@ -269,8 +285,7 @@ public class AppointmentService {
         if (oldFreq == null) return false;
         return !Objects.equals(oldFreq.getEnd_date(), dto.end_date())
                 || !Objects.equals(oldFreq.getFrequency_interval(), dto.frequency_interval())
-                || !Objects.equals(oldFreq.getFrequency(), dto.frequency())
-                || oldFreq.isEmailReminder() != dto.emailReminder();
+                || !Objects.equals(oldFreq.getFrequency(), dto.frequency());
     }
 
     public List<LocalDateTime> updateAppointment(AppointmentDTO dto) throws Exception {
@@ -293,9 +308,6 @@ public class AppointmentService {
 
         boolean frequencyChanged = hasFrequencyChanged(previousFrequency, dto.frequency());
         List<LocalDateTime> skippedDateTimes = List.of();
-        System.out.println((previousFrequency));
-        System.out.println((dto.frequency()));
-        System.out.println("---------------"+updatedFrequency);
         if (frequencyChanged && updatedFrequency != null) {
             skippedDateTimes = regenerateAppointments(updatedFrequency, dto, professional);
         }
@@ -366,6 +378,6 @@ public class AppointmentService {
     }
 
     public long getQuantityAppointments(){
-        return repository.findByAppointmentDateBetween(LocalDate.now().with(TemporalAdjusters.firstDayOfMonth()),LocalDate.now()).size();
+        return repository.findByAppointmentDateBetween(LocalDateTime.now().with(TemporalAdjusters.firstDayOfMonth()),LocalDateTime.now()).size();
     }
 }

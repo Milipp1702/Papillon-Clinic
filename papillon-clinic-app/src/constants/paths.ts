@@ -13,4 +13,5 @@ export const SCREEN_PATHS = {
   registerProfessional: '/professional/register',
   registerAppointment: '/appointments/register',
   calendar: '/calendar',
+  financialReport: '/financial-report',
 };

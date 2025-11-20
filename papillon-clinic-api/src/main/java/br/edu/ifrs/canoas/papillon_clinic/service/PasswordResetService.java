@@ -26,13 +26,10 @@ public class PasswordResetService {
     private EmailService emailService;
 
     public void generateRecoveryToken(String login) throws Exception {
-        System.out.println(login);
         Optional<User> user = userRepository.findUserByLogin(login.trim());
-        System.out.println(user.isPresent());
         if(user.isEmpty()) {
             throw new Exception("Usuário não encontrado!");
         }
-
         String token = UUID.randomUUID().toString();
         PasswordResetToken resetToken = new PasswordResetToken();
         resetToken.setToken(token);

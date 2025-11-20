@@ -5,6 +5,8 @@ import br.edu.ifrs.canoas.papillon_clinic.domain.patient.Patient;
 import br.edu.ifrs.canoas.papillon_clinic.domain.professional.Professional;
 import jakarta.persistence.*;
 import lombok.*;
+
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 
@@ -26,8 +28,8 @@ public class Appointment {
     @Column
     private String payment_type;
 
-    @Column
-    private LocalDateTime payment_date;
+    @Column(name = "payment_date")
+    private LocalDate paymentDate;
 
     @Column
     private String observation;
@@ -49,7 +51,7 @@ public class Appointment {
     private AppointmentFrequency frequency;
 
     public boolean isPaid(){
-        return this.payment_date!=null;
+        return this.paymentDate!=null;
     }
 
     public void assignFrequency(AppointmentFrequency frequency) {

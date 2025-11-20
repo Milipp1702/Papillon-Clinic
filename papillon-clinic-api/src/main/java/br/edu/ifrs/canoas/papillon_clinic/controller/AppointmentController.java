@@ -7,6 +7,7 @@ import br.edu.ifrs.canoas.papillon_clinic.service.AppointmentService;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
@@ -46,6 +47,13 @@ public class AppointmentController {
     @Transactional
     public List<LocalDateTime> update(@RequestBody AppointmentDTO appointmentDTO) throws Exception {
         return service.updateAppointment(appointmentDTO);
+    }
+
+    @DeleteMapping("/{id}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    @Transactional
+    public void delete(@PathVariable("id") String id, @RequestParam(name = "deleteFrequencyAppointments") boolean deleteFrequencyAppointments) throws Exception {
+        service.deleteAppointment(id, deleteFrequencyAppointments);
     }
 
     @GetMapping

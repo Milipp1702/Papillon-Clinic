@@ -7,5 +7,5 @@ import br.edu.ifrs.canoas.papillon_clinic.domain.guardian.GuardianResponseDTO;
 import java.time.LocalDate;
 import java.util.List;
 
-public record PatientDetailedDTO(String id, String name, LocalDate birthdate,AddressDTO address, List<GuardianResponseDTO> listGuardian, String observation) {
+public record PatientDetailedDTO(String id, String name, String cpf, LocalDate birthdate,AddressDTO address, List<GuardianResponseDTO> listGuardian, String observation) {
 }

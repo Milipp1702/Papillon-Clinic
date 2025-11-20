@@ -27,6 +27,9 @@ public class Patient {
     private String name;
 
     @Column
+    private String cpf;
+
+    @Column
     private LocalDate birthdate;
 
     @Column
@@ -50,6 +53,9 @@ public class Patient {
 
     @Column
     private LocalDateTime updated_at;
+
+    @Column(name = "active")
+    private boolean active = true;
 
     @OneToMany(mappedBy = "patient", cascade = CascadeType.ALL)
     private List<Appointment> listAppointments;

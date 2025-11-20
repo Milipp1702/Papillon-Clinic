@@ -11,7 +11,7 @@ public class ProfessionalMapper {
         professional.setCpf(dto.cpf());
         professional.setEmail(dto.email());
         professional.setDiscount(dto.discount());
-        professional.setCrm(dto.crm());
+        professional.setRegisterNumber(dto.registerNumber());
         professional.setName(dto.name());
         professional.setSpecialty(specialty);
         professional.setPhone_number(dto.phone_number());
@@ -20,11 +20,11 @@ public class ProfessionalMapper {
     }
 
     public static ProfessionalResponseDTO fromEntityToDtoResponse(Professional professional){
-        return new ProfessionalResponseDTO(professional.getId(), professional.getName(), professional.getCpf(), professional.getCrm());
+        return new ProfessionalResponseDTO(professional.getId(), professional.getName(), professional.getCpf(), professional.getSpecialty().getName());
     }
 
     public static ProfessionalDTO fromEntityToDto(Professional professional){
         List<ProfessionalWorkdayDTO> workdays = professional.getWorkdays().stream().map(ProfessionalWorkdayMapper::fromEntityToDto).toList();
-        return new ProfessionalDTO(professional.getId(), professional.getName(), professional.getCpf(), professional.getEmail(), professional.getCrm(), professional.getSpecialty().getId(), professional.getPhone_number(), professional.getDiscount(),workdays);
+        return new ProfessionalDTO(professional.getId(), professional.getName(), professional.getCpf(), professional.getEmail(), professional.getRegisterNumber(), professional.getSpecialty().getId(), professional.getPhone_number(), professional.getDiscount(),workdays);
     }
 }

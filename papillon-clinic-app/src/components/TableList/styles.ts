@@ -23,6 +23,15 @@ export const GuardianTable = styled.table`
     :nth-child(1) {
       border-left: none;
     }
+
+    .empty-table > div {
+      margin: 10px auto;
+    }
+
+    .empty-table {
+      background-color: ${({ theme }) => theme.colors.grey[300]};
+      padding: 20px 0;
+    }
   }
 
   td {
@@ -52,8 +61,24 @@ export const GuardianTable = styled.table`
 
     a {
       max-width: 200px;
-
       gap: 6px;
     }
+
+    a,
+    button {
+      width: auto;
+      padding: 0 11px;
+    }
+  }
+
+  .action-header {
+    width: 80px;
+  }
+
+  .action-cell {
+    width: 80px;
+    min-width: 60px;
+    max-width: 100px;
+    padding: 0;
   }
 `;

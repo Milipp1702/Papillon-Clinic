@@ -58,6 +58,20 @@ public class    PatientService {
 
     public Page<PatientResponseDTO> getListPatients(Pageable pagination){
         return repository.findAll(pagination).map(PatientMapper::fromEntityToDto);
+    public void softDeletePatient(String id) throws Exception {
+        Optional<Patient> optionalPatient = repository.findById(id);
+        if (optionalPatient.isEmpty() || !optionalPatient.get().isActive()) {
+            throw new Exception("Paciente não encontrado ou já está inativo!");
+        }
+
+        Patient patient = optionalPatient.get();
+        List<Appointment> futureAppointments = appointmentRepository
+                .findByPatient_IdAndAppointmentDateAfter(patient.getId(), LocalDateTime.now());
+
+        appointmentRepository.deleteAll(futureAppointments);
+
+        patient.setActive(false);
+        repository.save(patient);
     }
 
     public long getQuantityPatients(){
