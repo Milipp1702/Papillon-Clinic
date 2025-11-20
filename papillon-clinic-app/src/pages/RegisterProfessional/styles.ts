@@ -2,6 +2,8 @@ import styled from 'styled-components';
 
 export const Main = styled.main`
   padding-top: 40px;
+  overflow: auto;
+  height: 100vh;
 `;
 
 export const Title = styled.h1`
@@ -21,7 +23,8 @@ export const Form = styled.form`
   max-width: 80%;
 
   .button-register {
-    width: 200px;
+    width: auto;
+    padding: 0 25px;
     margin: 0 auto;
     margin-top: 50px;
   }
@@ -75,6 +78,17 @@ export const SuccessMessage = styled.span`
   color: ${({ theme }) => theme.colors.success};
   font-size: ${({ theme }) => theme.sizes.medium};
   text-align: center;
-  margin-top: 40px;
+  margin: 40px 0;
+  width: 100%;
+`;
+
+export const ErrorMessage = styled.span`
+  color: ${({ theme }) => theme.colors.error};
+  font-size: ${({ theme }) => theme.sizes.medium};
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+  margin: 20px 0;
   width: 100%;
 `;

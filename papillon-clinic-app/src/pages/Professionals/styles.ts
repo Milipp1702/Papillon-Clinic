@@ -24,7 +24,7 @@ export const InputContainer = styled.div`
   position: relative;
   width: 40%;
 
-  button {
+  #button-search {
     position: absolute;
     right: 10px;
     top: 1px;
@@ -38,4 +38,28 @@ export const InputContainer = styled.div`
 export const TableContainer = styled.div`
   max-height: 55vh;
   overflow-y: auto;
+`;
+
+export const Pagination = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  justify-content: center;
+  margin-top: 24px;
+
+  button {
+    width: auto;
+    min-height: auto;
+  }
+`;
+
+export const ErrorMessage = styled.span`
+  color: ${({ theme }) => theme.colors.error};
+  font-size: ${({ theme }) => theme.sizes.medium};
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+  margin: 20px 0;
+  width: 100%;
 `;

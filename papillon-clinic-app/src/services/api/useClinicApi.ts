@@ -72,6 +72,12 @@ interface IRoutes {
   findProfessionalById: (id: string) => Promise<ProfessionalDTO>;
   findAppointmentById: (id: string) => Promise<AppointmentDTO>;
   verifyToken: () => Promise<string>;
+  deletePatient: (id: string) => Promise<void>;
+  deleteProfessional: (id: string) => Promise<void>;
+  deleteAppointment: (
+    id: string,
+    deleteFrequencyAppointments: boolean
+  ) => Promise<void>;
 }
 
 export const useClinicApi = () => {
@@ -140,6 +146,23 @@ export const useClinicApi = () => {
   async function getPatients(page: number = 0, size: number = 10) {
     return await httpInstance.get<Page<PatientListDTO>>(
       `/patient?page=${page}&size=${size}`
+    );
+  }
+
+  async function deletePatient(id: string) {
+    return await httpInstance.del(`/patient/${id}`);
+  }
+
+  async function deleteProfessional(id: string) {
+    return await httpInstance.del(`/professional/${id}`);
+  }
+
+  async function deleteAppointment(
+    id: string,
+    deleteFrequencyAppointments: boolean
+  ) {
+    return await httpInstance.del(
+      `/appointment/${id}?deleteFrequencyAppointments=${deleteFrequencyAppointments}`
     );
   }
 
@@ -287,6 +310,9 @@ export const useClinicApi = () => {
         getProfessionals,
         getProfessionalsBySpecialty,
         getAppointments,
+        deletePatient,
+        deleteProfessional,
+        deleteAppointment,
         getAppointmentTypes,
         getListAppointmentsFinancial,
         getSpecialties,

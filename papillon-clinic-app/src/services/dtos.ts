@@ -2,6 +2,7 @@ import { Guardian } from '../pages/RegisterPatient';
 
 export type PatientDTO = {
   id?: string;
+  cpf: string;
   name: string;
   address: {
     street: string;
@@ -25,7 +26,7 @@ export type ProfessionalDTO = {
   name: string;
   cpf: string;
   email: string;
-  crm: string;
+  registerNumber: string;
   phone_number: string;
   specialty_id: string;
   discount: number;
@@ -53,7 +54,7 @@ export type ProfessionalListDTO = {
   id: string;
   name: string;
   cpf: string;
-  crm: string;
+  specialty: string;
 };
 
 type Frequency = {
@@ -73,7 +74,7 @@ export type AppointmentDTO = {
   professionalId: string;
   specialtyId?: string;
   professionalName?: string;
-  payment_date?: string;
+  paymentDate?: string;
   observation: string;
   frequency?: Frequency;
 };

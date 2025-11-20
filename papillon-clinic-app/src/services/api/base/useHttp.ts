@@ -34,5 +34,8 @@ export const useHttp = (
   const update = <T>(url: string, body: {}) =>
     axiosInstace.put<T>(url, body).then(responseBody);
 
-  return { get, post, update };
+  const del = <T>(url: string) =>
+    axiosInstace.delete<T>(url).then(responseBody);
+
+  return { get, post, update, del };
 };

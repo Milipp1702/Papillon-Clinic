@@ -30,9 +30,7 @@ const formErrors: dataFormat = {
 
 const schema = object({
   newPassword: string().required(),
-  confirmPassword: string()
-    .oneOf([ref('newPassword')], 'As senhas não coincidem')
-    .required(),
+  confirmPassword: string().required(),
 });
 
 const ResetPassword: React.FC = () => {
@@ -52,6 +50,11 @@ const ResetPassword: React.FC = () => {
   });
 
   const onSubmit = async (data: FormData) => {
+    if (data.newPassword !== data.confirmPassword) {
+      setErrorMessage('As senhas não coincidem.');
+      return;
+    }
+
     setIsLoading(true);
     try {
       await resetPassword(token, data.newPassword);
@@ -103,8 +106,7 @@ const ResetPassword: React.FC = () => {
           <Button type="submit" disabled={isLoading}>
             {isLoading ? (
               <>
-                <Spinner id="spinner" />
-                Enviando...
+                <Spinner id="spinner" /> Enviando...
               </>
             ) : (
               'Redefinir Senha'

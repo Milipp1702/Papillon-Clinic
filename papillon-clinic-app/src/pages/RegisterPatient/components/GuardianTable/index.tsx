@@ -1,7 +1,6 @@
 import { Guardian } from '../..';
 import Icon from '../../../../components/Icon';
 import Button from '../../../../components/baseComponents/Button';
-import VisuallyHidden from '../../../../components/baseComponents/VisuallyHidden';
 import * as S from './styles';
 
 type props = {
@@ -17,28 +16,6 @@ const GuardianTable: React.FC<props> = ({
 }) => {
   return (
     <S.GuardianTable>
-      <thead>
-        <tr>
-          <th>
-            <VisuallyHidden>Nome</VisuallyHidden>
-          </th>
-          <th>
-            <VisuallyHidden>CPF</VisuallyHidden>
-          </th>
-          <th>
-            <VisuallyHidden>Parentesco</VisuallyHidden>
-          </th>
-          <th>
-            <VisuallyHidden>Tipo</VisuallyHidden>
-          </th>
-          <th>
-            <VisuallyHidden>Número</VisuallyHidden>
-          </th>
-          <th>
-            <VisuallyHidden>Opções</VisuallyHidden>
-          </th>
-        </tr>
-      </thead>
       <tbody>
         {guardians &&
           guardians.map((guardian, index) => {

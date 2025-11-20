@@ -14,7 +14,8 @@ export const Form = styled.form`
   margin-bottom: 40px;
 
   .button-register {
-    width: 200px;
+    width: auto;
+    padding: 0 25px;
     margin: 0 auto;
     margin-top: 50px;
   }
@@ -43,28 +44,6 @@ export const InputContainer = styled.div`
   label {
     font-weight: bold;
     color: ${({ theme }) => theme.colors.title};
-  }
-`;
-
-export const TextareaContainer = styled.div`
-  display: flex;
-  width: 100%;
-  margin-top: 40px;
-
-  div {
-    display: flex;
-    flex-direction: column;
-    margin: 0 auto;
-    width: 500px;
-    max-width: 500px;
-
-    font-weight: bold;
-    color: ${({ theme }) => theme.colors.title};
-
-    textarea {
-      resize: none;
-      height: 100px;
-    }
   }
 `;
 
@@ -97,6 +76,15 @@ export const ErrorMessage = styled.span`
   align-items: center;
   gap: 20px;
   margin: 20px 0;
+  width: 100%;
+`;
+
+export const SuccessMessage = styled.span`
+  display: inline-block;
+  color: ${({ theme }) => theme.colors.success};
+  font-size: ${({ theme }) => theme.sizes.medium};
+  text-align: center;
+  margin-top: 40px;
   width: 100%;
 `;
 
