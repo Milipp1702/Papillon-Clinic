@@ -1,7 +1,14 @@
 import styled from 'styled-components';
 
 export const Main = styled.main`
-  padding-top: 40px;
+  padding: 40px 0;
+  overflow: auto;
+  height: 100vh;
+
+  .observation-textarea {
+    grid-column: 1 / -1;
+    margin-top: 0;
+  }
 `;
 
 export const Title = styled.h1`
@@ -21,13 +28,15 @@ export const Form = styled.form`
   max-width: 80%;
 
   .button-register {
-    width: 200px;
+    width: auto;
+    padding: 0 25px;
     margin: 0 auto;
     margin-top: 50px;
   }
   .button-filter {
-    width: 80px;
+    width: auto;
     margin: 0 auto;
+    padding: 0 10px;
     margin-top: 20px;
     font-size: 1.8rem;
     min-height: 27px;

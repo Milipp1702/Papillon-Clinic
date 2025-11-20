@@ -7,6 +7,14 @@ type props = {
 };
 
 const AvailableSlotsTable: React.FC<props> = ({ slots, onSelectSlot }) => {
+  const formatDate = (value: string) => {
+    const parts = value.split('-');
+    const year = parts[0];
+    const month = parts[1];
+    const day = parts[2];
+    return `${day}/${month}/${year}`;
+  };
+
   return (
     <S.AvailableSlotsTable>
       <thead>
@@ -32,7 +40,7 @@ const AvailableSlotsTable: React.FC<props> = ({ slots, onSelectSlot }) => {
                 className={variant}
                 key={'slot-' + index + slot.date + slot.time}
               >
-                <td>{slot.date}</td>
+                <td>{formatDate(slot.date)}</td>
                 <td>{slot.time}</td>
                 <td>{slot.professionalName}</td>
                 <td>

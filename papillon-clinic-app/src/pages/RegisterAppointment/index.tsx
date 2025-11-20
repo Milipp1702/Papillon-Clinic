@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useContext } from 'react';
 import { useForm } from 'react-hook-form';
 import PageWrapper from '../../components/PageWrapper';
 import Button from '../../components/baseComponents/Button';
@@ -21,6 +21,9 @@ import Icon from '../../components/Icon';
 import { appointmentToFormData } from '../../services/mappers';
 import FrequencyModal from './RemoveFrequencyModal';
 import { SCREEN_PATHS } from '../../constants/paths';
+import TextArea from '../../components/baseComponents/TextArea';
+import Spinner from '../../components/baseComponents/Spinner';
+import { AuthContext } from '../../context/AuthContext';
 
 const FREQUENCY_OPTIONS = ['DIARIA', 'SEMANAL', 'MENSAL', 'ANUAL'];
 
@@ -32,7 +35,7 @@ type FormAppointmentData = {
   appointmentTypeId: string;
   payment_type: string;
   professionalId: string;
-  payment_date?: string;
+  paymentDate?: string;
   observation: string;
   has_frequency: boolean;
   removeRelatedAppointments?: boolean;
@@ -89,6 +92,9 @@ const RegisterAppointment: React.FC = () => {
   const [specialtyId, setSpecialtyId] = useState('');
   const [appointmentTypeId, setAppointmentTypeId] = useState('');
   const [showFrequencyModal, setShowFrequencyModal] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [loadingRegister, setLoadingRegister] = useState(false);
+  const { user } = useContext(AuthContext);
   const [frequencyModalResolver, setFrequencyModalResolver] = useState<
     ((value: boolean) => void) | null
   >(null);
@@ -98,11 +104,19 @@ const RegisterAppointment: React.FC = () => {
     setSelectedSlot(undefined);
   };
 
+  const formatDate = (value: string) => {
+    const parts = value.split('-');
+    const year = parts[0];
+    const month = parts[1];
+    const day = parts[2];
+    return `${day}/${month}/${year}`;
+  };
+
   const SlotDetails = () => (
     <div>
       <p>
         <Icon size={24} icon="calendar" primaryColor="#F19CA3" />
-        {selectedSlot?.date}
+        {formatDate(selectedSlot?.date || '')}
       </p>
       <p>
         <Icon size={24} icon="clock" primaryColor="#F19CA3" />
@@ -134,7 +148,7 @@ const RegisterAppointment: React.FC = () => {
     appointmentTypeId: string().trim().required(),
     payment_type: string().trim().required(),
     professionalId: string().trim().required(),
-    payment_date: string().optional(),
+    paymentDate: string().optional(),
     observation: string().default(''),
     has_frequency: bool().default(false),
     frequency: object({
@@ -158,8 +172,6 @@ const RegisterAppointment: React.FC = () => {
     mode: 'onSubmit',
   });
 
-  console.log(errors);
-
   const callErrorDates = (skippedDateTimes: String[]) => {
     const formattedDates = skippedDateTimes.map((dt) =>
       new Date(dt.toString()).toLocaleString('pt-BR', {
@@ -179,6 +191,7 @@ const RegisterAppointment: React.FC = () => {
   };
 
   const onSubmit = async (appointment: FormAppointmentData) => {
+    setLoadingRegister(true);
     if (appointment.has_frequency) {
       const freq = appointment.frequency;
       const newErrors: { frequency?: string; end_date?: string } = {};
@@ -193,6 +206,7 @@ const RegisterAppointment: React.FC = () => {
 
       if (Object.keys(newErrors).length > 0) {
         setFrequencyErrors(newErrors);
+        setLoadingRegister(false);
         return;
       }
     } else {
@@ -201,10 +215,7 @@ const RegisterAppointment: React.FC = () => {
 
     appointment.appointment_date = `${appointment.appointment_date}T${appointment.appointment_time}`;
     setFrequencyErrors({});
-    console.log(appointment, id);
     if (id) {
-      console.log(oldFrequency, isFrequencyChecked);
-      console.log(appointment);
       if (oldFrequency === true && oldFrequency !== isFrequencyChecked) {
         const confirmed = await waitForFrequencyDecision();
         appointment.frequency = confirmed ? undefined : appointment.frequency;
@@ -216,15 +227,15 @@ const RegisterAppointment: React.FC = () => {
           id,
         });
         if (skippedDateTimes.length === 0) {
-          console.log(SCREEN_PATHS.appointments);
           navigate(SCREEN_PATHS.appointments);
         } else {
           callErrorDates(skippedDateTimes);
         }
+        setLoadingRegister(false);
       } catch (error) {
         console.log(error);
-        const errorObj = error as Error;
-        setError(errorObj.message || 'Erro ao atualizar o atendimento.');
+        setLoadingRegister(false);
+        setError('Erro ao atualizar o atendimento!');
       }
     } else {
       try {
@@ -235,8 +246,11 @@ const RegisterAppointment: React.FC = () => {
         } else {
           callErrorDates(skippedDateTimes);
         }
+        setLoadingRegister(false);
       } catch (error) {
+        setLoadingRegister(false);
         console.log(error);
+        setError('Erro ao cadastrar o atendimento!');
       }
     }
   };
@@ -294,6 +308,7 @@ const RegisterAppointment: React.FC = () => {
       changeSelectedSlot(slot);
       setAppointmentTypeId(response.appointmentTypeId);
       setValue('appointmentTypeId', response.appointmentTypeId);
+      setValue('paymentDate', response.paymentDate);
       setOldFrequency(!!response.frequency?.id);
     } catch (error) {
       console.log('error' + error);
@@ -367,6 +382,7 @@ const RegisterAppointment: React.FC = () => {
   };
 
   const getAvailableSlots = async () => {
+    setLoading(true);
     try {
       const selectedProfessionalId = getValues('professionalId');
       const selectedDate = getValues('appointment_date');
@@ -381,9 +397,9 @@ const RegisterAppointment: React.FC = () => {
       } else {
         setErrorSlot('Nenhum profissional disponível.');
         setAvailableSlots([]);
+        setLoading(false);
         return;
       }
-      console.log(professionalIds, specialtyId, selectedDate);
       const response = await getAllAvailableSlots(
         professionalIds,
         specialtyId,
@@ -395,9 +411,11 @@ const RegisterAppointment: React.FC = () => {
       } else {
         setErrorSlot('');
       }
+      setLoading(false);
     } catch (error) {
       console.error('Erro ao buscar horários:', error);
       setErrorSlot('Erro ao buscar horários.');
+      setLoading(false);
     }
   };
 
@@ -498,9 +516,16 @@ const RegisterAppointment: React.FC = () => {
             className="button-filter"
             type="button"
             variant="primary"
+            disabled={user?.role !== 'ADMIN'}
             onClick={getAvailableSlots}
           >
-            Filtrar
+            {loading ? (
+              <>
+                <Spinner id="spinner" /> Filtrando...
+              </>
+            ) : (
+              <span>Filtrar</span>
+            )}
           </Button>
           <S.TableWrapper>
             {selectedSlot || Boolean(errorSlot) ? (
@@ -517,6 +542,7 @@ const RegisterAppointment: React.FC = () => {
                       variant="primary"
                       className="button-change-slot"
                       onClick={resetSelection}
+                      disabled={user?.role !== 'ADMIN'}
                     >
                       Alterar Horário
                     </Button>
@@ -537,7 +563,11 @@ const RegisterAppointment: React.FC = () => {
               <S.SecondFieldset>
                 <S.InputContainer>
                   <label htmlFor="payment_type">Tipo de Pagamento</label>
-                  <Input id="payment_type" {...register('payment_type')} />
+                  <Input
+                    id="payment_type"
+                    disabled={user?.role !== 'ADMIN'}
+                    {...register('payment_type')}
+                  />
                   {errors.payment_type?.type &&
                     errors.payment_type?.type !== 'optionality' && (
                       <InputError>
@@ -546,10 +576,20 @@ const RegisterAppointment: React.FC = () => {
                     )}
                 </S.InputContainer>
                 <S.InputContainer>
+                  <label htmlFor="paymentDate">Data do Pagamento</label>
+                  <Input
+                    id="paymentDate"
+                    type="date"
+                    disabled={user?.role !== 'ADMIN'}
+                    {...register('paymentDate')}
+                  />
+                </S.InputContainer>
+                <S.InputContainer>
                   <label htmlFor="patient_id">Paciente</label>
                   <S.Select
                     defaultValue={''}
                     id="patient_id"
+                    disabled={user?.role !== 'ADMIN'}
                     {...register('patientId')}
                   >
                     <option value="" disabled>
@@ -561,7 +601,6 @@ const RegisterAppointment: React.FC = () => {
                           {patient.name}
                         </option>
                       ))}
-                    <option value="newPatient">Cadastrar novo paciente</option>
                   </S.Select>
                   {errors.patientId?.type &&
                     errors.patientId?.type !== 'optionality' && (
@@ -574,6 +613,7 @@ const RegisterAppointment: React.FC = () => {
                   <input
                     type="checkbox"
                     id="frequency"
+                    disabled={user?.role !== 'ADMIN'}
                     checked={isFrequencyChecked}
                     onChange={(event) => {
                       changeVisibilityOfFrequencyFields(event.target.checked);
@@ -590,6 +630,7 @@ const RegisterAppointment: React.FC = () => {
                       <Input
                         id="appointment_date"
                         type="date"
+                        disabled={user?.role !== 'ADMIN'}
                         {...register('frequency.end_date')}
                       />
                       {frequencyErrors.end_date && (
@@ -601,6 +642,7 @@ const RegisterAppointment: React.FC = () => {
                       <S.Select
                         defaultValue={''}
                         id="frequency"
+                        disabled={user?.role !== 'ADMIN'}
                         {...register('frequency.frequency')}
                       >
                         <option value="" disabled>
@@ -622,18 +664,32 @@ const RegisterAppointment: React.FC = () => {
                         id="interval"
                         type="number"
                         max={30}
+                        disabled={user?.role !== 'ADMIN'}
                         {...register('frequency.frequency_interval')}
                       />
                     </S.InputContainer>
                   </>
                 )}
+                <TextArea className="observation-textarea">
+                  <div>
+                    <label htmlFor="observation">Observação</label>
+                    <textarea id="observation" {...register('observation')} />
+                  </div>
+                </TextArea>
               </S.SecondFieldset>
               <Button
                 className="button-register"
                 variant="terciary"
                 type="submit"
               >
-                {id ? 'Salvar' : 'Cadastrar'}
+                {loadingRegister ? (
+                  <>
+                    <Spinner id="spinner" />{' '}
+                    {id ? 'Salvando...' : 'Cadastrando...'}
+                  </>
+                ) : (
+                  <>{id ? 'Salvar' : 'Cadastrar'}</>
+                )}
               </Button>
               <FrequencyModal
                 isOpen={showFrequencyModal}
