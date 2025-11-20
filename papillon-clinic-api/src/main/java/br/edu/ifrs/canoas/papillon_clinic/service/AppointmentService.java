@@ -317,7 +317,23 @@ public class AppointmentService {
     }
 
     public Page<AppointmentResponseDTO> getListAppointments(Pageable pagination){
-        return repository.findAll(pagination).map(AppointmentMapper::fromEntityToDtoResponse);
+        Pageable sortedByDate = PageRequest.of(
+                pagination.getPageNumber(),
+                pagination.getPageSize(),
+                Sort.by("appointmentDate").ascending()
+        );
+        return repository.findAll(sortedByDate).map(AppointmentMapper::fromEntityToDtoResponse);
+    }
+
+    public Page<AppointmentResponseDTO> getListAppointmentsForProfessional(Pageable pagination, String userId) {
+        Pageable sortedByDate = PageRequest.of(
+                pagination.getPageNumber(),
+                pagination.getPageSize(),
+                Sort.by("appointmentDate").ascending()
+        );
+        return repository.findByProfessional_UserId(userId, sortedByDate)
+                .map(AppointmentMapper::fromEntityToDtoResponse);
+    }
 
     public List<AppointmentFinancialDTO> getAppointmentFinancials(String patientId, String professionalId) {
         List<Object[]> results = entityManager.createNativeQuery("""
@@ -375,6 +391,42 @@ public class AppointmentService {
         return appointments.stream()
                 .map(AppointmentMapper::fromEntityToDtoResponse)
                 .collect(Collectors.toList());
+    }
+
+    public Page<AppointmentResponseDTO> search(String query, Pageable pageable) {
+        Page<Appointment> result;
+
+        try {
+            System.out.println(query);
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+
+            LocalDate date = LocalDate.parse(query, formatter);
+            LocalDateTime startOfDay = date.atStartOfDay();
+            LocalDateTime endOfDay = date.atTime(LocalTime.MAX);
+
+            List<Appointment> appointments = repository.findByAppointmentDateBetween(startOfDay, endOfDay);
+
+            int start = (int) pageable.getOffset();
+            int end = Math.min((start + pageable.getPageSize()), appointments.size());
+            result = new PageImpl<>(appointments.subList(start, end), pageable, appointments.size());
+        } catch (DateTimeParseException e) {
+            if (query.equalsIgnoreCase("pago")) {
+                result = repository.findByPaymentDateIsNotNull(pageable);
+            } else if (query.equalsIgnoreCase("não pago") || query.equalsIgnoreCase("nao pago")) {
+                result = repository.findByPaymentDateIsNull(pageable);
+            } else {
+                result = repository.findByProfessionalNameContainingIgnoreCaseOrPatientNameContainingIgnoreCaseOrAppointmentTypesNameContainingIgnoreCaseOrProfessionalSpecialtyNameContainingIgnoreCase(
+                        query, query, query, query, pageable);
+            }
+        } return result.map(a -> new AppointmentResponseDTO(
+                a.getId(),
+                a.getProfessional().getName(),
+                a.getPatient().getName(),
+                a.getAppointmentTypes().getName(),
+                a.getAppointmentDate(),
+                a.getPaymentDate() != null,
+                a.getProfessional().getSpecialty().getName()
+        ));
     }
 
     public long getQuantityAppointments(){

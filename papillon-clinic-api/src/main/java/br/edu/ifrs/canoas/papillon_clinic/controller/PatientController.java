@@ -36,6 +36,23 @@ public class PatientController {
         service.updatePatient(patientDto);
     }
 
+    @GetMapping("/search")
+    public Page<PatientResponseDTO> search(
+            @RequestParam(defaultValue = "") String query,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
+
+        Pageable pageable = PageRequest.of(page, size);
+        return service.search(query, pageable);
+    }
+
+    @DeleteMapping("/{id}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    @Transactional
+    public void deletePatient(@PathVariable("id") String id) throws Exception {
+        service.softDeletePatient(id);
+    }
+
     @GetMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
     public ResponseEntity<PatientDetailedDTO> getById(@PathVariable("id") String id) throws Exception {
@@ -46,6 +63,12 @@ public class PatientController {
     @ResponseStatus(HttpStatus.OK)
     public ResponseEntity<Page<PatientResponseDTO>> getListPatients(@PageableDefault(sort = "name")Pageable pagination) {
         return ResponseEntity.ok(service.getListPatients(pagination));
+    }
+
+    @GetMapping("getAllPatients")
+    @ResponseStatus(HttpStatus.OK)
+    public ResponseEntity<List<PatientResponseDTO>> getAllPatients() {
+        return ResponseEntity.ok(service.getAllPatients());
     }
 
     @GetMapping("getAmount")

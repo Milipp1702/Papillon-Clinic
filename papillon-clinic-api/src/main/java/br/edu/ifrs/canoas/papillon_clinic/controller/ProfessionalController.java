@@ -99,6 +99,16 @@ public class ProfessionalController {
         return ResponseEntity.ok(slots);
     }
 
+    @GetMapping("/search")
+    public Page<ProfessionalResponseDTO> search(
+            @RequestParam(defaultValue = "") String query,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
+
+        Pageable pageable = PageRequest.of(page, size);
+        return service.search(query, pageable);
+    }
+
     @GetMapping("getIdByUser")
     @ResponseStatus(HttpStatus.OK)
     public ResponseEntity<String> getIdByUser(String userId){

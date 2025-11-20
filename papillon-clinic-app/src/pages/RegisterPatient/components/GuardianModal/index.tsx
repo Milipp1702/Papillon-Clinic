@@ -11,6 +11,7 @@ import { dataFormat } from '../../../../constants/types';
 import InputError from '../../../../components/baseComponents/InputError';
 import * as S from './styles';
 import { useEffect } from 'react';
+import TextArea from '../../../../components/baseComponents/TextArea';
 
 type Props = {
   isOpen: boolean;
@@ -26,6 +27,7 @@ export type FormGuardianData = {
   cpf: string;
   phoneNumber: string;
   isMain: string;
+  observation?: string;
 };
 
 const formErrors: dataFormat = {
@@ -38,6 +40,7 @@ const formErrors: dataFormat = {
   cpf: {
     required: 'Informe o CPF!',
     min: 'CPF deve ter no minímo 11 digitos!',
+    max: 'CPF deve ter no máximo 11 digitos!',
     matches: 'CPF deve possuir apenas números!',
   },
   phoneNumber: {
@@ -72,6 +75,7 @@ const GuardianModal: React.FC<Props> = ({
       .min(11)
       .max(11),
     isMain: string().required().nonNullable(),
+    observation: string().trim().optional(),
   });
 
   const {
@@ -132,6 +136,7 @@ const GuardianModal: React.FC<Props> = ({
                 </option>
                 <option value="MAE">MÃE</option>
                 <option value="PAI">PAI</option>
+                <option value="OUTRO">OUTRO</option>
               </S.Select>
               {errors.relationship?.type && (
                 <InputError>
@@ -159,10 +164,8 @@ const GuardianModal: React.FC<Props> = ({
             </S.InputContainer>
           </S.InputWrapper>
         </S.Fieldset>
-
         <S.RadioButtonFieldset>
           <span className="title">Responsável Principal?</span>
-
           <S.RadioButtonWrapper role="radiogroup">
             <S.RadioContainer>
               <S.RadioButton
@@ -187,6 +190,12 @@ const GuardianModal: React.FC<Props> = ({
             <InputError>{formErrors['isMain'][errors.isMain?.type]}</InputError>
           )}
         </S.RadioButtonFieldset>
+        <TextArea>
+          <div>
+            <label htmlFor="observation">Observação</label>
+            <textarea id="observation" {...register('observation')} />
+          </div>
+        </TextArea>
         <Button
           className="button-add "
           type="button"

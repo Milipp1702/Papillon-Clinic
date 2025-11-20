@@ -47,7 +47,6 @@ public class Patient {
     )
     private List<Guardian> guardians;
 
-
     @Column
     private LocalDateTime created_at;
 

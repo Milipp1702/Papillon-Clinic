@@ -42,6 +42,9 @@ public class ProfessionalService {
     @Autowired
     ProfessionalWorkdayRepository professionalWorkdayRepository;
 
+    @Autowired
+    AppointmentRepository appointmentRepository;
+
     public Optional<Professional> getById(String id){
         return repository.findById(id);
     }
@@ -111,8 +114,19 @@ public class ProfessionalService {
 
         repository.save(professional);
     }
+
     public Page<ProfessionalResponseDTO> getListProfessionals(Pageable pagination){
         return repository.findAll(pagination).map(ProfessionalMapper::fromEntityToDtoResponse);
+    }
+
+    public Page<ProfessionalResponseDTO> search(String query, Pageable pageable) {
+        Page<Professional> result = repository
+                .findByNameContainingIgnoreCaseOrCpfContainingIgnoreCaseOrSpecialtyNameContainingIgnoreCase(
+                        query, query, query, pageable);
+
+        return result.map(p -> new ProfessionalResponseDTO(
+                p.getId(), p.getName(), p.getCpf(), p.getSpecialty().getName()
+        ));
     }
 
     public List<ProfessionalResponseDTO> getAllProfessionals() {

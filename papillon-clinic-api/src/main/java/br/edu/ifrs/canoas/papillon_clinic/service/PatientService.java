@@ -1,6 +1,7 @@
 package br.edu.ifrs.canoas.papillon_clinic.service;
 
 
+import br.edu.ifrs.canoas.papillon_clinic.domain.appointment.Appointment;
 import br.edu.ifrs.canoas.papillon_clinic.domain.patient.Patient;
 import br.edu.ifrs.canoas.papillon_clinic.domain.patient.PatientDetailedDTO;
 import br.edu.ifrs.canoas.papillon_clinic.domain.patient.PatientRegisterDTO;
@@ -8,24 +9,34 @@ import br.edu.ifrs.canoas.papillon_clinic.domain.patient.PatientResponseDTO;
 import br.edu.ifrs.canoas.papillon_clinic.mapper.AddressMapper;
 import br.edu.ifrs.canoas.papillon_clinic.mapper.GuardianMapper;
 import br.edu.ifrs.canoas.papillon_clinic.mapper.PatientMapper;
+import br.edu.ifrs.canoas.papillon_clinic.repository.AppointmentRepository;
 import br.edu.ifrs.canoas.papillon_clinic.repository.PatientRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import java.time.format.DateTimeFormatter;
+
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.Period;
+import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import br.edu.ifrs.canoas.papillon_clinic.domain.guardian.Guardian;
 
 @Service
 public class    PatientService {
     @Autowired
     PatientRepository repository;
 
-    public Optional<Patient> getById(String id){
-        return repository.findById(id);
+    @Autowired
+    AppointmentRepository appointmentRepository;
+
+    public Optional<Patient> getById(String id) {
+        return repository.findById(id)
+                .filter(Patient::isActive);
     }
 
     public PatientDetailedDTO findById(String id) throws Exception {
@@ -43,6 +54,7 @@ public class    PatientService {
         }
         Patient newPatient = oldPatient.get();
         newPatient.setName(patient.name());
+        newPatient.setCpf(patient.cpf());
         newPatient.setBirthdate(patient.birthdate());
         newPatient.setAge(Period.between(patient.birthdate(), LocalDate.now()).getYears());
         newPatient.setAddress(AddressMapper.fromDtoToEntity(patient.address()));
@@ -51,13 +63,65 @@ public class    PatientService {
         repository.save(newPatient);
     }
 
-    public void registerPatient(PatientRegisterDTO patientDto){
+    public void registerPatient(PatientRegisterDTO patientDto) throws Exception {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        LocalDate birthdate = LocalDate.parse(patientDto.birthdate(), formatter);
+
+        if (repository.existsByNameAndBirthdate(patientDto.name(), birthdate)) {
+            throw new Exception("Paciente já existe!");
+        }
+
         Patient newPatient = PatientMapper.fromDtoToEntity(patientDto);
         repository.save(newPatient);
     }
 
-    public Page<PatientResponseDTO> getListPatients(Pageable pagination){
-        return repository.findAll(pagination).map(PatientMapper::fromEntityToDto);
+    public Page<PatientResponseDTO> search(String query, Pageable pageable) {
+        Page<Patient> result;
+
+        try {
+            int age = Integer.parseInt(query);
+            LocalDate today = LocalDate.now();
+            LocalDate startDate = today.minusYears(age + 1).plusDays(1);
+            LocalDate endDate = today.minusYears(age);
+
+            result = repository.findByBirthdateBetween(startDate, endDate, pageable);
+
+        } catch (NumberFormatException e) {
+            result = repository.findByNameContainingIgnoreCase(query, pageable);
+
+            if (result.isEmpty()) {
+                result = repository.findByGuardiansNameContainingIgnoreCaseAndGuardiansMainTrue(query, pageable);
+            }
+        }
+
+        return result.map(p -> {
+            String mainGuardian = p.getGuardians().stream()
+                    .filter(Guardian::isMain)
+                    .map(Guardian::getName)
+                    .findFirst()
+                    .orElse(null);
+
+            return new PatientResponseDTO(
+                    p.getId(),
+                    p.getName(),
+                    Period.between(p.getBirthdate(), LocalDate.now()).getYears(),
+                    mainGuardian
+            );
+        });
+    }
+
+
+    public Page<PatientResponseDTO> getListPatients(Pageable pagination) {
+        return repository.findByActiveTrue(pagination)
+                .map(PatientMapper::fromEntityToDto);
+    }
+
+    public List<PatientResponseDTO> getAllPatients() {
+        return repository.findByActiveTrue().stream()
+                .map(PatientMapper::fromEntityToDto)
+                .collect(Collectors.toList());
+    }
+
     public void softDeletePatient(String id) throws Exception {
         Optional<Patient> optionalPatient = repository.findById(id);
         if (optionalPatient.isEmpty() || !optionalPatient.get().isActive()) {

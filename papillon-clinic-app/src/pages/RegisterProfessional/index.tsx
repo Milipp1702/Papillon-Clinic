@@ -16,13 +16,14 @@ import { professionalToFormData } from '../../services/mappers';
 import { SCREEN_PATHS } from '../../constants/paths';
 import WorkdaySelector from './WorkdaySelector';
 import { Workday } from '../../services/dtos';
+import Spinner from '../../components/baseComponents/Spinner';
 
 type FormProfessionalData = {
   id?: string;
   name: string;
   cpf: string;
   email: string;
-  crm: string;
+  registerNumber: string;
   phone_number: string;
   specialty_id: string;
   discount: number;
@@ -38,8 +39,8 @@ const formErrors: dataFormat = {
   name: {
     required: 'Informe o nome!',
   },
-  crm: {
-    required: 'Informe o CRM!',
+  registerNumber: {
+    required: 'Informe o número de registro profissional!',
   },
   email: {
     required: 'Informe um email válido!',
@@ -47,6 +48,7 @@ const formErrors: dataFormat = {
   cpf: {
     required: 'Informe o CPF!',
     min: 'CPF deve ter no minímo 11 digitos!',
+    max: 'CPF deve ter no máximo 11 digitos!',
     matches: 'CPF deve possuir apenas números!',
   },
   phone_number: {
@@ -67,6 +69,7 @@ const formErrors: dataFormat = {
 
 const RegisterProfessional: React.FC = () => {
   const [success, setSuccess] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const [professional, setProfessional] = useState<FormProfessionalData | null>(
     null
   );
@@ -78,6 +81,7 @@ const RegisterProfessional: React.FC = () => {
   const [selectedWorkdays, setSelectedWorkdays] = useState<WorkdayWithShift[]>(
     []
   );
+  const [loading, setLoading] = useState(false);
   const {
     registerProfessional,
     updateProfessional,
@@ -87,7 +91,7 @@ const RegisterProfessional: React.FC = () => {
 
   const ProfessionalSchema = object({
     name: string().trim().required(),
-    crm: string().trim().required(),
+    registerNumber: string().trim().required(),
     cpf: string().trim().required().matches(ONLY_NUMBERS).min(11).max(11),
     email: string().trim().required().email('Email inválido!'),
     phone_number: string()
@@ -119,9 +123,8 @@ const RegisterProfessional: React.FC = () => {
     values: { ...professional } as FormProfessionalData,
   });
 
-  console.log(errors);
-
   const onSubmit = async (data: FormProfessionalData) => {
+    setLoading(true);
     const professional = {
       ...data,
       workdays: selectedWorkdays,
@@ -130,18 +133,23 @@ const RegisterProfessional: React.FC = () => {
     if (id) {
       try {
         await updateProfessional({ ...professional, id });
+        setLoading(false);
         return navigate(SCREEN_PATHS.professionals);
       } catch (error) {
-        console.log(error);
+        setSuccess(false);
+        setLoading(false);
+        setError('Erro ao atualizar profissional.');
       }
     } else {
       try {
-        console.log(professional);
         await registerProfessional(professional);
-        setSuccess((current) => !current);
+        setSuccess(true);
         reset();
+        setLoading(false);
       } catch (error) {
-        console.log(error);
+        setSuccess(false);
+        setLoading(false);
+        setError('Erro ao cadastrar profissional.');
       }
     }
   };
@@ -153,17 +161,18 @@ const RegisterProfessional: React.FC = () => {
       setSpecialties(response);
     } catch (error) {
       console.log('error' + error);
-      //setError('Erro ao buscar especialidades.');
+      setError('Erro ao buscar especialidades.');
     }
   };
 
   const getProfessionalData = async (id: string) => {
     try {
       const response = await findProfessionalById(id);
+      console.log(response);
       setProfessional(professionalToFormData(response));
       setSelectedWorkdays(response.workdays);
     } catch (error) {
-      console.log('error' + error);
+      setError('Erro ao buscar dados do profissional.');
     }
   };
 
@@ -213,10 +222,12 @@ const RegisterProfessional: React.FC = () => {
               )}
             </S.InputContainer>
             <S.InputContainer>
-              <label htmlFor="crm">CRM</label>
-              <Input id="crm" {...register('crm')} />
-              {errors.crm?.type && (
-                <InputError>{formErrors['crm'][errors.crm?.type]}</InputError>
+              <label htmlFor="crm">Número de Registro Profissional</label>
+              <Input id="crm" {...register('registerNumber')} />
+              {errors.registerNumber?.type && (
+                <InputError>
+                  {formErrors['registerNumber'][errors.registerNumber?.type]}
+                </InputError>
               )}
             </S.InputContainer>
             <S.InputContainer>
@@ -264,12 +275,19 @@ const RegisterProfessional: React.FC = () => {
             selected={selectedWorkdays}
             onChange={setSelectedWorkdays}
           />
+          <Button className="button-register" variant="terciary" type="submit">
+            {loading ? (
+              <>
+                <Spinner id="spinner" /> {id ? 'Salvando...' : 'Cadastrando...'}
+              </>
+            ) : (
+              <>{id ? 'Salvar' : 'Cadastrar'}</>
+            )}
+          </Button>
           {success && (
             <S.SuccessMessage>Profissional Cadastrado!</S.SuccessMessage>
           )}
-          <Button className="button-register" variant="terciary" type="submit">
-            {id ? 'Salvar' : 'Cadastrar'}
-          </Button>
+          {error && <S.ErrorMessage>{error}</S.ErrorMessage>}
         </S.Form>
       </S.Main>
     </PageWrapper>
