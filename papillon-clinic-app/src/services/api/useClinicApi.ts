@@ -13,6 +13,7 @@ import {
   SpecialtyListDTO,
   AvailableSlotsDTO,
   WorkdayWithShiftsDTO,
+  AppointmentFinancialDTO,
 } from '../dtos';
 
 export type AuthData = {
@@ -61,6 +62,10 @@ interface IRoutes {
   getAppointmentsForCalendar: (
     professionalIds?: String[]
   ) => Promise<AppointmentListDTO[]>;
+  getListAppointmentsFinancial: (
+    patientId?: String,
+    professionalId?: String
+  ) => Promise<AppointmentFinancialDTO[]>;
   getAllProfessionals: () => Promise<ProfessionalListDTO[]>;
   getProfessionalIdByUser: (userId: String) => Promise<String>;
   findPatientById: (id: string) => Promise<PatientDTO>;
@@ -166,6 +171,22 @@ export const useClinicApi = () => {
     return await httpInstance.get<AppointmentTypeListDTO[]>(`/appointmentType`);
   }
 
+  async function getListAppointmentsFinancial(
+    patientId?: String,
+    professionalId?: String
+  ) {
+    let queryParams = ``;
+
+    if (patientId) {
+      queryParams = `patientId=${patientId}`;
+    } else {
+      queryParams = `professionalId=${professionalId}`;
+    }
+
+    const url = `/appointment/getListAppointmentsFinancial?${queryParams}`;
+    return await httpInstance.get<AppointmentFinancialDTO[]>(url);
+  }
+
   async function getSpecialties() {
     return await httpInstance.get<SpecialtyListDTO[]>(`/specialty`);
   }
@@ -267,6 +288,7 @@ export const useClinicApi = () => {
         getProfessionalsBySpecialty,
         getAppointments,
         getAppointmentTypes,
+        getListAppointmentsFinancial,
         getSpecialties,
         getTopSixProfessionals,
         getNumberOfProfessionals,

@@ -7,11 +7,6 @@ import papillon_icon_small from '../../assets/papillon_icon_small.png';
 import MenuHamburguer from '../MenuHamburguer';
 import * as S from './styles';
 
-/*
-  ADICIONAR LOGICA APARECER APENAS OPÇÕES QUE O USUÁRIO TEM ACESSO
-
-*/
-
 const NAV_LINKS = [
   { path: '/home', name: 'Home', icon: 'home', isAdmin: false },
   { path: '/patients', name: 'Pacientes', icon: 'patient', isAdmin: false },
@@ -28,8 +23,12 @@ const NAV_LINKS = [
     isAdmin: false,
   },
   { path: '/calendar', name: 'Agenda', icon: 'calendar', isAdmin: false },
-  { path: '#', name: 'Financeiro', icon: 'finance', isAdmin: true },
-  { path: '#', name: 'Relatórios', icon: 'notepad', isAdmin: false },
+  {
+    path: '/financial-report',
+    name: 'Relatórios Financeiros',
+    icon: 'finance',
+    isAdmin: true,
+  },
 ];
 
 type Props = {
@@ -42,6 +41,11 @@ const SideBar: React.FC<Props> = ({ isOpen, handleMenu }) => {
 
   const handleLogout = () => {
     logout();
+  };
+
+  const canAccess = (isAdminItem: boolean, role: string) => {
+    if (role === 'ADMIN') return true;
+    return !isAdminItem;
   };
 
   return (
@@ -61,16 +65,16 @@ const SideBar: React.FC<Props> = ({ isOpen, handleMenu }) => {
           />
         </S.NavHeader>
         <S.List>
-          {NAV_LINKS.map((item, index) => {
-            return (
-              <S.ListItem key={index + '-menu-item'}>
-                <Link to={item.path}>
-                  <Icon size={24} icon={item.icon} />
-                  <span>{item.name}</span>
-                </Link>
-              </S.ListItem>
-            );
-          })}
+          {NAV_LINKS.filter((item) =>
+            canAccess(item.isAdmin, user?.role || 'USER')
+          ).map((item, index) => (
+            <S.ListItem key={index + '-menu-item'}>
+              <Link to={item.path}>
+                <Icon size={24} icon={item.icon} />
+                <span>{item.name}</span>
+              </Link>
+            </S.ListItem>
+          ))}
         </S.List>
       </div>
       <S.NavFooter $isOpen={isOpen}>

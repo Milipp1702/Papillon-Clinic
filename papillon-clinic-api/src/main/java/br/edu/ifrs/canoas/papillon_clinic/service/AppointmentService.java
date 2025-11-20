@@ -7,15 +7,19 @@ import br.edu.ifrs.canoas.papillon_clinic.mapper.AppointmentFrequencyMapper;
 import br.edu.ifrs.canoas.papillon_clinic.mapper.AppointmentMapper;
 import br.edu.ifrs.canoas.papillon_clinic.repository.AppointmentFrequencyRepository;
 import br.edu.ifrs.canoas.papillon_clinic.repository.AppointmentRepository;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.http.HttpStatus;
+import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
-import org.springframework.web.server.ResponseStatusException;
 
+import java.math.BigDecimal;
+import java.sql.Timestamp;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.time.temporal.ChronoUnit;
 import java.time.temporal.TemporalAdjusters;
 import java.util.ArrayList;
@@ -44,6 +48,10 @@ public class AppointmentService {
 
     @Autowired
     ProfessionalWorkdayService professionalWorkdayService;
+
+    @PersistenceContext
+    private EntityManager entityManager;
+
 
     public Optional<Appointment> getById(String id){
         return repository.findById(id);
@@ -298,6 +306,49 @@ public class AppointmentService {
 
     public Page<AppointmentResponseDTO> getListAppointments(Pageable pagination){
         return repository.findAll(pagination).map(AppointmentMapper::fromEntityToDtoResponse);
+
+    public List<AppointmentFinancialDTO> getAppointmentFinancials(String patientId, String professionalId) {
+        List<Object[]> results = entityManager.createNativeQuery("""
+                            SELECT 
+                                a.appointment_date,
+                                p.name,                                             
+                                pr.name,
+                                at.name,
+                                s.name,
+                                at.amount,
+                                CASE WHEN a.payment_date IS NOT NULL THEN true ELSE false END AS isPaid,
+                                pr.discount
+                            FROM appointments a
+                            JOIN patients p ON a.patient_id = p.id
+                            JOIN professionals pr ON a.professional_id = pr.id
+                            JOIN specialties s ON pr.specialty_id = s.id
+                            JOIN appointment_types at ON a.appointment_type = at.id
+                            WHERE (:patientId IS NULL OR a.patient_id = :patientId)
+                              AND (:professionalId IS NULL OR a.professional_id = :professionalId)
+                              AND MONTH(a.appointment_date) = MONTH(CURRENT_DATE)
+                              AND YEAR(a.appointment_date) = YEAR(CURRENT_DATE)
+                        """)
+                .setParameter("patientId", patientId)
+                .setParameter("professionalId", professionalId)
+                .getResultList();
+
+
+        return results.stream()
+                .map(r -> {
+                    BigDecimal amount = (BigDecimal) r[5];
+                    BigDecimal discount = (BigDecimal) r[7];
+                    BigDecimal netAmount = amount.multiply(BigDecimal.ONE.subtract(discount.divide(BigDecimal.valueOf(100))));
+                    return new AppointmentFinancialDTO(
+                        ((Timestamp) r[0]).toLocalDateTime(),
+                        (String) r[1],
+                        (String) r[2],
+                        (String) r[3],
+                        (String) r[4],
+                        (BigDecimal) r[5],
+                        (Long) r[6],
+                            netAmount
+                );})
+                .toList();
     }
 
     public List<AppointmentResponseDTO> getAppointmentsForCalendar(List<String> professionalIds) {

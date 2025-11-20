@@ -54,6 +54,15 @@ public class AppointmentController {
         return ResponseEntity.ok(service.getListAppointments(pagination));
     }
 
+
+    @GetMapping("getListAppointmentsFinancial")
+    @ResponseStatus(HttpStatus.OK)
+    public ResponseEntity<List<AppointmentFinancialDTO>> getAppointmentsFinancial(
+            @RequestParam(required = false) String patientId,
+            @RequestParam(required = false) String professionalId) {
+        return ResponseEntity.ok(service.getAppointmentFinancials(patientId, professionalId));
+    }
+
     @GetMapping("getAppointmentsForCalendar")
     @ResponseStatus(HttpStatus.OK)
     public ResponseEntity<List<AppointmentResponseDTO>> getAppointmentsForCalendar(@RequestParam(required = false) List<String> professionalIds){

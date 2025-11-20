@@ -39,6 +39,16 @@ export type PatientListDTO = {
   guardian: string;
 };
 
+export type AppointmentFinancialDTO = {
+  appointmentDate: string;
+  professionalName: string;
+  appoitmentType: string;
+  specialtyName: string;
+  isPaid: boolean;
+  amount: number;
+  amountProfessional: number;
+};
+
 export type ProfessionalListDTO = {
   id: string;
   name: string;
