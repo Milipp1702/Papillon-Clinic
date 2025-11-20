@@ -17,7 +17,7 @@ import java.util.List;
 public interface AppointmentRepository extends JpaRepository<Appointment,String> {
     List<Appointment> findByAppointmentDateBetween(LocalDateTime firstDayOfMonth, LocalDateTime lastDayOfMonth);
 
-    List<Appointment> findByFrequency_IdAndAppointmentDateAfterAnd(String frequencyId, LocalDateTime date);
+    List<Appointment> findByFrequency_IdAndAppointmentDateAfterAndPaymentDateIsNull(String frequencyId, LocalDateTime date);
 
     List<Appointment> findByProfessional_IdIn(List<String> professionalIds);
 

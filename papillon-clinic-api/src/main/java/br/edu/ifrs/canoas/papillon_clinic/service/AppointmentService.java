@@ -203,7 +203,7 @@ public class AppointmentService {
             repository.save(existing);
 
             List<Appointment> futureAppointments = repository
-                    .findByFrequency_IdAndAppointmentDateAfter(oldFreq.getId(), LocalDateTime.now());
+                    .findByFrequency_IdAndAppointmentDateAfterAndPaymentDateIsNull(oldFreq.getId(), LocalDateTime.now());
 
             repository.deleteAll(futureAppointments);
             appointmentFrequencyRepository.delete(oldFreq);
@@ -227,7 +227,7 @@ public class AppointmentService {
 
         if (deleteFrequencyAppointments && frequency != null) {
             List<Appointment> futureAppointments = repository
-                    .findByFrequency_IdAndAppointmentDateAfter(frequency.getId(), LocalDateTime.now());
+                    .findByFrequency_IdAndAppointmentDateAfterAndPaymentDateIsNull(frequency.getId(), LocalDateTime.now());
 
             repository.deleteAll(futureAppointments);
             appointmentFrequencyRepository.delete(frequency);
@@ -257,7 +257,7 @@ public class AppointmentService {
 
     private List<LocalDateTime> regenerateAppointments(AppointmentFrequency frequency, AppointmentDTO dto, Professional professional) throws Exception {
         List<Appointment> futureAppointments = repository
-                .findByFrequency_IdAndAppointmentDateAfter(frequency.getId(), LocalDateTime.now());
+                .findByFrequency_IdAndAppointmentDateAfterAndPaymentDateIsNull(frequency.getId(), LocalDateTime.now());
 
         List<Appointment> toDelete = futureAppointments.stream()
                 .filter(a -> !a.getAppointmentDate().isEqual(dto.appointment_date()))
