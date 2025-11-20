@@ -32,6 +32,7 @@ const TableList: React.FC<Props> = ({
   hasTotalRow,
   onDeleteRequest,
 }) => {
+  console.log(rows);
   return (
     <S.GuardianTable>
       <thead>
@@ -94,12 +95,14 @@ const TableList: React.FC<Props> = ({
                     {!withoutDeleteButton && (
                       <td className="action-cell">
                         <div className="options-column">
-                          <Button
-                            onClick={() => onDeleteRequest?.(row['id'])}
-                            aria-label="Deletar"
-                          >
-                            <Icon icon="close" size={20} />
-                          </Button>
+                          {!row['isPaid'] && (
+                            <Button
+                              onClick={() => onDeleteRequest?.(row['id'])}
+                              aria-label="Deletar"
+                            >
+                              <Icon icon="close" size={20} />
+                            </Button>
+                          )}
                         </div>
                       </td>
                     )}
