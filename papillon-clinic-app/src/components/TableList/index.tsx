@@ -109,7 +109,7 @@ const TableList: React.FC<Props> = ({
             })}
             {hasTotalRow && (
               <tr className="total-row">
-                {columns.map((col, index) => {
+                {columns.map((_, index) => {
                   const total =
                     hasTotalRow === 'professional'
                       ? rows.reduce(

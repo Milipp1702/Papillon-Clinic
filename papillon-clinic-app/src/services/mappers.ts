@@ -123,7 +123,7 @@ export const appointmentToFormData = (
     appointmentTypeId: data.appointmentTypeId,
     payment_type: data.payment_type,
     professionalId: data.professionalId,
-    payment_date: data.payment_date ?? undefined,
+    payment_date: data.paymentDate ?? undefined,
     observation: data.observation ?? undefined,
     has_frequency: data.frequency?.id ? true : false,
     frequency: {
