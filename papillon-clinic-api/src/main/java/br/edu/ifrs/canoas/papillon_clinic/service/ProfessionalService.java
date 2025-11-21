@@ -91,10 +91,18 @@ public class ProfessionalService {
     }
 
     public void registerProfessional(ProfessionalDTO dto) throws Exception {
-        if (repository.existsByEmail(dto.email())) {
-            throw new Exception("Profissional com este e-mail já está cadastrado!");
-        }
+        Optional<Professional> oldProfessional = repository.findByEmail(dto.email());
+        if (oldProfessional.isPresent()) {
+            if(oldProfessional.get().isActive()){
+                throw new Exception("Profissional com este e-mail já está cadastrado!");
+            }else {
+                Professional reactiveProfessional = oldProfessional.get();
+                reactiveProfessional.setActive(true);
 
+                repository.save(reactiveProfessional);
+                throw new Exception("Profissional reativado!");
+            }
+        }
         Specialty specialty = specialtyService.getById(dto.specialty_id())
                 .orElseThrow(() -> new Exception("Especialidade não encontrada"));
 
@@ -116,7 +124,7 @@ public class ProfessionalService {
     }
 
     public Page<ProfessionalResponseDTO> getListProfessionals(Pageable pagination){
-        return repository.findAll(pagination).map(ProfessionalMapper::fromEntityToDtoResponse);
+        return repository.findByActiveTrue(pagination).map(ProfessionalMapper::fromEntityToDtoResponse);
     }
 
     public Page<ProfessionalResponseDTO> search(String query, Pageable pageable) {
@@ -130,7 +138,7 @@ public class ProfessionalService {
     }
 
     public List<ProfessionalResponseDTO> getAllProfessionals() {
-        return repository.findAll().stream()
+        return repository.findByActiveTrue().stream()
                 .map(ProfessionalMapper::fromEntityToDtoResponse)
                 .collect(Collectors.toList());
     }
@@ -144,7 +152,7 @@ public class ProfessionalService {
         Professional professional = optionalProfessional.get();
 
         List<Appointment> futureAppointments = appointmentRepository
-                .findByProfessional_IdAndAppointmentDateAfter(professional.getId(), LocalDateTime.now());
+                .findByProfessional_IdAndAppointmentDateAfterAndPaymentDateIsNull(professional.getId(), LocalDateTime.now());
 
         appointmentRepository.deleteAll(futureAppointments);
 

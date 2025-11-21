@@ -17,7 +17,6 @@ import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
 import java.util.List;
-import java.util.Map;
 
 @RestController
 @RequestMapping("professional")
@@ -29,10 +28,14 @@ public class ProfessionalController {
     private ProfessionalWorkdayService professionalWorkdayService;
 
     @PostMapping
-    @ResponseStatus(HttpStatus.CREATED)
     @Transactional
-    public void register(@RequestBody ProfessionalDTO professionalDto) throws Exception {
-        service.registerProfessional(professionalDto);
+    public ResponseEntity<String> register(@RequestBody ProfessionalDTO professionalDto) throws Exception {
+        try {
+            service.registerProfessional(professionalDto);
+            return ResponseEntity.status(HttpStatus.CREATED).body("Profissional cadastrado com sucesso!");
+        }catch (Exception e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
     }
 
     @PutMapping

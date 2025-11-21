@@ -8,6 +8,7 @@ import org.springframework.stereotype.Repository;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface PatientRepository extends JpaRepository<Patient,String> {
@@ -27,5 +28,5 @@ public interface PatientRepository extends JpaRepository<Patient,String> {
 
     Page<Patient> findByBirthdateBetween(LocalDate startDate, LocalDate endDate, Pageable pageable);
 
-    boolean existsByNameAndBirthdate(String name, LocalDate birthdate);
+    Optional<Patient> findByNameAndBirthdate(String name, LocalDate birthdate);
 }

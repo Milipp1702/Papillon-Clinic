@@ -23,9 +23,9 @@ public interface AppointmentRepository extends JpaRepository<Appointment,String>
 
     Page<Appointment> findByProfessional_UserId(String userId, Pageable pageable);
 
-    List<Appointment> findByPatient_IdAndAppointmentDateAfter(String patientId, LocalDateTime dateTime);
+    List<Appointment> findByPatient_IdAndAppointmentDateAfterAndPaymentDateIsNull(String patientId, LocalDateTime dateTime);
 
-    List<Appointment> findByProfessional_IdAndAppointmentDateAfter(String professionalId, LocalDateTime dateTime);
+    List<Appointment> findByProfessional_IdAndAppointmentDateAfterAndPaymentDateIsNull(String professionalId, LocalDateTime dateTime);
 
     Page<Appointment> findByProfessionalNameContainingIgnoreCaseOrPatientNameContainingIgnoreCaseOrAppointmentTypesNameContainingIgnoreCaseOrProfessionalSpecialtyNameContainingIgnoreCase(
             String professionalName,

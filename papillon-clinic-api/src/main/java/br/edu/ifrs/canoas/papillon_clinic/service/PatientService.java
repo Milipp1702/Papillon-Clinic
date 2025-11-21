@@ -6,6 +6,7 @@ import br.edu.ifrs.canoas.papillon_clinic.domain.patient.Patient;
 import br.edu.ifrs.canoas.papillon_clinic.domain.patient.PatientDetailedDTO;
 import br.edu.ifrs.canoas.papillon_clinic.domain.patient.PatientRegisterDTO;
 import br.edu.ifrs.canoas.papillon_clinic.domain.patient.PatientResponseDTO;
+import br.edu.ifrs.canoas.papillon_clinic.domain.professional.Professional;
 import br.edu.ifrs.canoas.papillon_clinic.mapper.AddressMapper;
 import br.edu.ifrs.canoas.papillon_clinic.mapper.GuardianMapper;
 import br.edu.ifrs.canoas.papillon_clinic.mapper.PatientMapper;
@@ -66,11 +67,18 @@ public class    PatientService {
     public void registerPatient(PatientRegisterDTO patientDto) throws Exception {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
         LocalDate birthdate = LocalDate.parse(patientDto.birthdate(), formatter);
+        Optional<Patient> oldPatient = repository.findByNameAndBirthdate(patientDto.name(), birthdate);
+        if(oldPatient.isPresent()) {
+            if(oldPatient.get().isActive()){
+                throw new Exception("Paciente já existe!");
+            }else {
+                Patient reactivePatient = oldPatient.get();
+                reactivePatient.setActive(true);
 
-        if (repository.existsByNameAndBirthdate(patientDto.name(), birthdate)) {
-            throw new Exception("Paciente já existe!");
+                repository.save(reactivePatient);
+                throw new Exception("Paciente reativado!");
+            }
         }
-
         Patient newPatient = PatientMapper.fromDtoToEntity(patientDto);
         repository.save(newPatient);
     }
@@ -130,7 +138,7 @@ public class    PatientService {
 
         Patient patient = optionalPatient.get();
         List<Appointment> futureAppointments = appointmentRepository
-                .findByPatient_IdAndAppointmentDateAfter(patient.getId(), LocalDateTime.now());
+                .findByPatient_IdAndAppointmentDateAfterAndPaymentDateIsNull(patient.getId(), LocalDateTime.now());
 
         appointmentRepository.deleteAll(futureAppointments);
 

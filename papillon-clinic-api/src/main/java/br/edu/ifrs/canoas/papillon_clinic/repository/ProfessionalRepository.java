@@ -1,5 +1,6 @@
 package br.edu.ifrs.canoas.papillon_clinic.repository;
 
+import br.edu.ifrs.canoas.papillon_clinic.domain.patient.Patient;
 import br.edu.ifrs.canoas.papillon_clinic.domain.professional.Professional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -18,6 +19,10 @@ public interface ProfessionalRepository extends JpaRepository<Professional,Strin
 
     List<Professional> findBySpecialtyIdAndActiveTrue(String specialtyId);
 
+    List<Professional> findByActiveTrue();
+
+    Page<Professional> findByActiveTrue(Pageable pageable);
+
     @Query("SELECT p.name FROM professionals p WHERE p.id = :id AND p.active = true")
     String findNameById(@Param("id") String id);
 
@@ -27,7 +32,7 @@ public interface ProfessionalRepository extends JpaRepository<Professional,Strin
     @Query("SELECT p.id FROM professionals p WHERE p.specialty.id = :specialtyId AND p.active = true")
     List<String> findIdsBySpecialtyId(@Param("specialtyId") String specialtyId);
 
-    boolean existsByEmail(String email);
+    Optional<Professional> findByEmail(String email);
 
     @Query("SELECT p.id FROM professionals p WHERE p.active = true")
     List<String> findAllIds();
