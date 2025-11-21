@@ -17,6 +17,7 @@ import { SCREEN_PATHS } from '../../constants/paths';
 import WorkdaySelector from './WorkdaySelector';
 import { Workday } from '../../services/dtos';
 import Spinner from '../../components/baseComponents/Spinner';
+import { AxiosError } from 'axios';
 
 type FormProfessionalData = {
   id?: string;
@@ -56,7 +57,7 @@ const formErrors: dataFormat = {
     min: 'Número inválido!',
     matches: 'Número de telefone deve possuir apenas números!',
   },
-  specialty: {
+  specialty_id: {
     required: 'Informe a especialidade!',
   },
   discount: {
@@ -68,7 +69,7 @@ const formErrors: dataFormat = {
 };
 
 const RegisterProfessional: React.FC = () => {
-  const [success, setSuccess] = useState(false);
+  const [success, setSuccess] = useState('');
   const [error, setError] = useState<string | null>(null);
   const [professional, setProfessional] = useState<FormProfessionalData | null>(
     null
@@ -136,20 +137,26 @@ const RegisterProfessional: React.FC = () => {
         setLoading(false);
         return navigate(SCREEN_PATHS.professionals);
       } catch (error) {
-        setSuccess(false);
+        setSuccess('');
         setLoading(false);
         setError('Erro ao atualizar profissional.');
       }
     } else {
       try {
         await registerProfessional(professional);
-        setSuccess(true);
+        setSuccess('Profissional Cadastrado!');
         reset();
         setLoading(false);
       } catch (error) {
-        setSuccess(false);
+        setSuccess('');
         setLoading(false);
-        setError('Erro ao cadastrar profissional.');
+        console.log(error);
+        const errorMessage = (error as AxiosError).response?.data as string;
+        if (errorMessage === 'Profissional reativado!') {
+          setSuccess(errorMessage);
+        } else {
+          setError(errorMessage || 'Erro ao cadastrar profissional.');
+        }
       }
     }
   };
@@ -284,9 +291,7 @@ const RegisterProfessional: React.FC = () => {
               <>{id ? 'Salvar' : 'Cadastrar'}</>
             )}
           </Button>
-          {success && (
-            <S.SuccessMessage>Profissional Cadastrado!</S.SuccessMessage>
-          )}
+          {success && <S.SuccessMessage>{success}</S.SuccessMessage>}
           {error && <S.ErrorMessage>{error}</S.ErrorMessage>}
         </S.Form>
       </S.Main>
