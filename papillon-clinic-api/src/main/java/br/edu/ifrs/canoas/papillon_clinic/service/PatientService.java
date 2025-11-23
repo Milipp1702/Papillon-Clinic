@@ -6,7 +6,6 @@ import br.edu.ifrs.canoas.papillon_clinic.domain.patient.Patient;
 import br.edu.ifrs.canoas.papillon_clinic.domain.patient.PatientDetailedDTO;
 import br.edu.ifrs.canoas.papillon_clinic.domain.patient.PatientRegisterDTO;
 import br.edu.ifrs.canoas.papillon_clinic.domain.patient.PatientResponseDTO;
-import br.edu.ifrs.canoas.papillon_clinic.domain.professional.Professional;
 import br.edu.ifrs.canoas.papillon_clinic.mapper.AddressMapper;
 import br.edu.ifrs.canoas.papillon_clinic.mapper.GuardianMapper;
 import br.edu.ifrs.canoas.papillon_clinic.mapper.PatientMapper;
@@ -84,23 +83,14 @@ public class    PatientService {
     }
 
     public Page<PatientResponseDTO> search(String query, Pageable pageable) {
-        Page<Patient> result;
+        Integer age = Optional.ofNullable(query)
+                .filter(q -> q.matches("\\d+"))
+                .map(Integer::parseInt)
+                .orElse(null);
 
-        try {
-            int age = Integer.parseInt(query);
-            LocalDate today = LocalDate.now();
-            LocalDate startDate = today.minusYears(age + 1).plusDays(1);
-            LocalDate endDate = today.minusYears(age);
-
-            result = repository.findByBirthdateBetween(startDate, endDate, pageable);
-
-        } catch (NumberFormatException e) {
-            result = repository.findByNameContainingIgnoreCase(query, pageable);
-
-            if (result.isEmpty()) {
-                result = repository.findByGuardiansNameContainingIgnoreCaseAndGuardiansMainTrue(query, pageable);
-            }
-        }
+        Page<Patient> result = repository
+                .findByNameContainingIgnoreCaseOrAgeOrGuardiansNameContainingIgnoreCaseAndGuardiansMainTrue(
+                        query, age, query, pageable);
 
         return result.map(p -> {
             String mainGuardian = p.getGuardians().stream()
@@ -112,12 +102,11 @@ public class    PatientService {
             return new PatientResponseDTO(
                     p.getId(),
                     p.getName(),
-                    Period.between(p.getBirthdate(), LocalDate.now()).getYears(),
+                    p.getAge(),
                     mainGuardian
             );
         });
     }
-
 
     public Page<PatientResponseDTO> getListPatients(Pageable pagination) {
         return repository.findByActiveTrue(pagination)

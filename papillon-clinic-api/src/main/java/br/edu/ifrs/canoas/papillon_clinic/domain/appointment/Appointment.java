@@ -42,7 +42,7 @@ public class Appointment {
     @JoinColumn(name = "patient_id")
     private Patient patient;
 
-    @OneToOne
+    @ManyToOne
     @JoinColumn(name = "appointment_type")
     private AppointmentTypes appointmentTypes;
 

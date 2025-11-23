@@ -397,7 +397,6 @@ public class AppointmentService {
         Page<Appointment> result;
 
         try {
-            System.out.println(query);
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 
             LocalDate date = LocalDate.parse(query, formatter);
