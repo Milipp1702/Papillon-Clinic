@@ -19,14 +19,12 @@ public interface PatientRepository extends JpaRepository<Patient,String> {
 
     long countByActiveTrue();
 
-    Page<Patient> findByNameContainingIgnoreCase(String name, Pageable pageable);
-
-    Page<Patient> findByGuardiansNameContainingIgnoreCaseAndGuardiansMainTrue(
+    Page<Patient> findByNameContainingIgnoreCaseOrAgeOrGuardiansNameContainingIgnoreCaseAndGuardiansMainTrue(
+            String name,
+            Integer age,
             String guardianName,
             Pageable pageable
     );
-
-    Page<Patient> findByBirthdateBetween(LocalDate startDate, LocalDate endDate, Pageable pageable);
 
     Optional<Patient> findByNameAndBirthdate(String name, LocalDate birthdate);
 }
